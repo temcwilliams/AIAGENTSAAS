@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     owner_setup_token_hash: str = ""
     session_hours: int = Field(default=12, ge=1, le=168)
     chat_requests_per_hour: int = Field(default=60, ge=1, le=10000)
+    login_requests_per_minute: int = Field(default=30, ge=1, le=1000)
+    conversations_per_hour: int = Field(default=120, ge=1, le=10000)
 
 settings = Settings()
 if settings.environment == "production":

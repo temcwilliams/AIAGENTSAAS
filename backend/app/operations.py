@@ -1,9 +1,10 @@
 from datetime import timezone
+from anyio import from_thread
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, func, and_
 from sqlalchemy.orm import Session as DBSession
 import httpx
-from .db import get_db
+from .db import get_db, locked_scalar
 from .security import tenant, admin
 from .models import Agent, Conversation, Usage, Message, KnowledgeDocument, now
 from .schemas import KnowledgeInput, HandoffInput, HandoffStatus, HumanReply
@@ -14,8 +15,7 @@ router=APIRouter(prefix='/businesses/{business_id}',dependencies=[Depends(tenant
 
 def resource(db,model,business_id,id,lock=False):
     q=select(model).where(model.id==id,model.business_id==business_id)
-    if lock:q=q.with_for_update().execution_options(populate_existing=True)
-    row=db.scalar(q)
+    row=locked_scalar(db,q) if lock else db.scalar(q)
     if not row:raise HTTPException(404,'Resource not found')
     return row
 
@@ -71,8 +71,11 @@ def inference(business_id:str):
     return {'mode':settings.ai_provider,'configured':settings.ai_provider=='local' or settings.ai_provider in ('cloud','bridge') and bool(settings.openai_api_key),'local_model':'qwen2.5:1.5b'}
 
 @router.post('/inference/check',dependencies=[Depends(admin)])
-async def check_inference(business_id:str,db:DBSession=Depends(get_db)):
+def check_inference(business_id:str,db:DBSession=Depends(get_db)):
     consume(db,f'inference-check:{business_id}',10,3600)
+    return from_thread.run(fetch_inference_models)
+
+async def fetch_inference_models():
     if settings.ai_provider=='disabled' or settings.ai_provider in ('cloud','bridge') and not settings.openai_api_key:raise HTTPException(503,'Inference is not configured')
     headers={'Authorization':f'Bearer {settings.openai_api_key}'} if settings.ai_provider in ('cloud','bridge') else {}
     try:

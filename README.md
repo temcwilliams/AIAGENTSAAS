@@ -64,6 +64,9 @@ The root `.env` configures the container stack. Separate `backend/.env.example` 
 - `OPENAI_BASE_URL` is `http://ollama:11434/v1` inside Compose, or `http://127.0.0.1:11434/v1` for native development. Native Ollama must be installed and running separately.
 - `APP_ORIGIN` must equal the exact browser origin. If you change the frontend URL, update it consistently.
 - `CHAT_REQUESTS_PER_HOUR` defaults to 60 per business across users and agents. Failed provider attempts count. This prevents unbounded requests but is not a token or currency budget.
+- `LOGIN_REQUESTS_PER_MINUTE` defaults to 30 globally, shared across workers and email addresses. Per-email limits also apply. Argon2 operations are limited to one per worker; concurrent attempts receive 429 and a retry hint. These bounds protect the small free instance; a sustained attack can still temporarily deny login capacity.
+- JSON requests are limited to 64,000 bytes before parsing at both the frontend proxy and backend. Conversation mutations use PostgreSQL nonwaiting row locks: overlapping turns/handoff updates return 409 with a retry hint. Database waits run outside the API event loop.
+- `CONVERSATIONS_PER_HOUR` defaults to 120 per business across users and agents, limiting empty-conversation storage abuse. Long-term retention and storage quotas remain future work.
 - The database password is randomly generated; no production credentials are hardcoded. Keep environment files out of source control.
 - Local inference timeout is 180 seconds; cloud inference remains 60 seconds. Very slow local models may still time out.
 
