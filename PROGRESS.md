@@ -1,6 +1,6 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-13, 16:59 UTC**  
+Last updated: **2026-11-13, 17:49 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
@@ -21,6 +21,7 @@ Maintained as an ongoing project log. Read this file when starting or resuming w
 | Automatic deployments | Disabled; application releases are deployed manually |
 | Hosted AI | `AI_PROVIDER=disabled` |
 | Latest complete backend suite | **49 tests passed** |
+| Milestone 3 | [Six-workstream plan](docs/MILESTONE_3_PLAN.md) prepared for review; implementation not started |
 | Guided Linux setup | [Setup script](scripts/setup_ollama.py) ready; user still needs to run it on their Linux machine |
 | Initial administrator | Created through one-time owner setup; initial sign-in was verified |
 | Pilot business / starter agent | **Not created**; saved setup credentials were rejected during later verification |
@@ -146,6 +147,10 @@ The isolated Neon branch `milestone2-validation` is retained for development val
 4. **Verify actual inference.** Check connectivity in the Inference screen, run one approved conversation, inspect grounding/references and token totals, and confirm performance on the actual Linux hardware.
 5. **Run a small business pilot.** Add real, approved business facts, exercise consented lead capture and human handoff, and collect usability feedback.
 
+### Planned next development milestone
+
+The user requested that account recovery, business onboarding, website widget, lead pipeline, team handoff management, and floor personalization be planned **before implementation**. The detailed sequence and acceptance criteria are in [Milestone 3 plan](docs/MILESTONE_3_PLAN.md). Only planning/documentation has been completed; none of these new workstreams is marked implemented or deployed. The plan retains original floor design, business isolation, and free-hosting constraints.
+
 ### Before broad client access
 
 - [ ] Email ownership verification and email-based password recovery.
@@ -182,6 +187,7 @@ All entries below are from **2026-11-13**. Exact individual clock times were not
 | Milestone 2 | Original floor, knowledge/citations, contact capture, handoff, Linux bridge | [PR #3](https://github.com/temcwilliams/AIAGENTSAAS/pull/3), 42 tests passed |
 | Milestone 2 deployment | Release live, PostgreSQL schema updated | `16bc5403a06c8ae716c7fcff3b0adda07259f671`, `dep-dbrjnelckfvc73efg3tg`, schema `0004` |
 | Ongoing tracking | This canonical progress document and repository update instructions added | Documentation-only update; no application deployment needed |
+| Milestone 3 planning | User requested all six proposed workstreams, with planning first. Detailed plan prepared for review | Documentation only; no code, migrations, emails, credentials, or deployment changes |
 | Ollama connection preparation | User confirmed Linux host is not set up. Added guided setup and tests; official Linux publisher asset names/checksums checked | 49 tests passed; hosted AI remains disabled pending execution on the user's machine and Render configuration |
 
 ## How this file will be maintained

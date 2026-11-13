@@ -135,3 +135,7 @@ Apply migration `0004` before starting the new version. It preserves existing da
 ## Guided Ollama connection
 
 Run `python3 scripts/setup_ollama.py` from the project root on your own Linux machine. It prepares rootless Ollama, pulls the local model, verifies a response and token usage, starts the protected bridge/temporary HTTPS tunnel, and creates a private Render configuration file. It does not change the hosted app or publish credentials automatically. See [the Linux guide](docs/linux-inference.md) for prerequisites and the final Render connection step.
+
+## Next development plan
+
+[Milestone 3 plan](docs/MILESTONE_3_PLAN.md) covers account recovery, onboarding, a public website widget, lead pipeline, team handoff management, and original floor personalization. It is a review plan; implementation has not started.
