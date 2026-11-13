@@ -16,6 +16,7 @@ def test_gateway_requires_auth_and_preserves_protocol(gateway,monkeypatch):
     c,module=gateway
     assert c.get('/v1/models').status_code==401
     assert c.get('/v1/models',headers={'Authorization':'Bearer wrong'}).status_code==401
+    assert c.get('/v1/models',headers=[(b'authorization',b'Bearer \xff')]).status_code==401
     calls=[]
     async def fake(method,path,payload=None):
         calls.append((method,path,payload))

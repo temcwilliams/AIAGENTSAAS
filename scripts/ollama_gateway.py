@@ -22,7 +22,7 @@ request_count=0
 async def protect_body(request:Request,call_next):
     authorization=request.headers.get('authorization','')
     scheme,_,token=authorization.partition(' ')
-    if scheme.lower()!='bearer' or not secrets.compare_digest(token,secret):
+    if scheme.lower()!='bearer' or not secrets.compare_digest(token.encode(),secret.encode()):
         return JSONResponse({'detail':'Authentication required'},status_code=401)
     chunks=[];size=0
     async for chunk in request.stream():
@@ -33,7 +33,7 @@ async def protect_body(request:Request,call_next):
     return await call_next(request)
 
 def authorized(credentials:HTTPAuthorizationCredentials=Depends(security)):
-    if not credentials or not secrets.compare_digest(credentials.credentials,secret):raise HTTPException(401,'Authentication required')
+    if not credentials or not secrets.compare_digest(credentials.credentials.encode(),secret.encode()):raise HTTPException(401,'Authentication required')
 
 class Turn(BaseModel):
     role:Literal['system','user','assistant']
