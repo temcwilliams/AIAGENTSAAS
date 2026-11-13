@@ -1,0 +1,26 @@
+# Free preview configuration. No paid services or databases are provisioned.
+# Requires an existing external PostgreSQL database and a pushed Git repository.
+previews:
+  generation: 'off'
+services:
+  - type: web
+    name: agent-studio-pwa
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeployTrigger: 'off'
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: APP_ORIGIN
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_URL_UNPOOLED
+        sync: false
+      - key: AI_PROVIDER
+        value: disabled
+      - key: CHAT_REQUESTS_PER_HOUR
+        value: '60'
