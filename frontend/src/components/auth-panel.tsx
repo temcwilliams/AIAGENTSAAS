@@ -4,9 +4,13 @@ type Props={busy:boolean;error:string;submit:(path:string,data:Record<string,str
 export default function AuthPanel({busy,error,submit,clearError}:Props){
   const [signup,setSignup]=useState(false),[setupToken,setSetupToken]=useState(''),[confirmError,setConfirmError]=useState(''),[ownerLink,setOwnerLink]=useState(false);
   useEffect(()=>{
-    const params=new URLSearchParams(window.location.hash.slice(1));
-    const token=params.get('owner-setup');
-    if(token){setOwnerLink(true);setSetupToken(token);setSignup(true);window.history.replaceState(null,'',window.location.pathname+window.location.search);}
+    const readSetupLink=()=>{
+      const params=new URLSearchParams(window.location.hash.slice(1));
+      const token=params.get('owner-setup');
+      if(token){setOwnerLink(true);setSetupToken(token);setSignup(true);window.history.replaceState(null,'',window.location.pathname+window.location.search);}
+    };
+    readSetupLink();window.addEventListener('hashchange',readSetupLink);
+    return ()=>window.removeEventListener('hashchange',readSetupLink);
   },[]);
   function changeMode(){setSignup(!signup);setConfirmError('');clearError()}
   function onSubmit(event:FormEvent<HTMLFormElement>){
