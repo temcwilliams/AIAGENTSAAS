@@ -131,3 +131,7 @@ The **Agent floor** opens an original meadow-inspired operations view. Agent sta
 - **Inference:** the status panel distinguishes configuration from actual reachability. Administrators can explicitly check the configured `/models` endpoint. `AI_PROVIDER=bridge` supports your authenticated HTTPS Ollama bridge on Linux. Follow `docs/linux-inference.md`; the hosted app remains disabled until your machine and endpoint are ready. The bridge uses only free software, but your hardware/network availability and tunnel-provider terms still apply.
 
 Apply migration `0004` before starting the new version. It preserves existing data while adding knowledge, response sources, handoff fields, and conversation-linked lead capture. Tests cover cross-tenant retrieval, disabled documents, source persistence, consent/deduplication, human takeover/resume, floor statistics, and bridge authentication/request limits.
+
+## Guided Ollama connection
+
+Run `python3 scripts/setup_ollama.py` from the project root on your own Linux machine. It prepares rootless Ollama, pulls the local model, verifies a response and token usage, starts the protected bridge/temporary HTTPS tunnel, and creates a private Render configuration file. It does not change the hosted app or publish credentials automatically. See [the Linux guide](docs/linux-inference.md) for prerequisites and the final Render connection step.
