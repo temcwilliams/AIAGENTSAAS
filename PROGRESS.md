@@ -1,6 +1,6 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-13, 16:39 UTC**  
+Last updated: **2026-11-13, 16:59 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
@@ -20,7 +20,8 @@ Maintained as an ongoing project log. Read this file when starting or resuming w
 | Latest verified live deployment | `dep-dbrjnelckfvc73efg3tg` |
 | Automatic deployments | Disabled; application releases are deployed manually |
 | Hosted AI | `AI_PROVIDER=disabled` |
-| Latest complete backend suite | **42 tests passed** |
+| Latest complete backend suite | **49 tests passed** |
+| Guided Linux setup | [Setup script](scripts/setup_ollama.py) ready; user still needs to run it on their Linux machine |
 | Initial administrator | Created through one-time owner setup; initial sign-in was verified |
 | Pilot business / starter agent | **Not created**; saved setup credentials were rejected during later verification |
 
@@ -75,6 +76,7 @@ The public hostname retains the original service name; the application, browser 
 - [x] Local inference works without a paid API key; cloud credentials are never forwarded to local Ollama.
 - [x] Local endpoint restrictions, bridge/cloud modes, and an explicit disabled mode.
 - [x] Free-software setup instructions and clear distinction between free software and hosting/hardware costs.
+- [x] Guided rootless Linux setup script with private reusable token storage, verified official publisher downloads, local inference/usage validation, protected bridge, temporary HTTPS tunnel, and a private Render configuration file. The script is prepared and tested; the user must run it on their Linux host.
 
 ### Installable PWA and Render deployment
 
@@ -109,7 +111,7 @@ The public hostname retains the original service name; the application, browser 
 
 | Area | Result | Scope / limit |
 |---|---|---|
-| Backend tests | **42 passed** | One existing upstream Starlette/AnyIO deprecation warning; no failing tests |
+| Backend tests | **49 passed** | One existing upstream Starlette/AnyIO deprecation warning; no failing tests |
 | Frontend production build | Passed | Includes TypeScript validation |
 | GitHub checks | Passed for the Milestone 2 release | PR #3 merged |
 | SQLite migration round trips | Passed | Includes populated-data preservation and full downgrade/reapply in disposable databases |
@@ -121,7 +123,8 @@ The public hostname retains the original service name; the application, browser 
 | Live frontend | Verified served | Bundle contains Meadow Commons, knowledge, and handoff interfaces |
 | Live endpoint protection | Verified | Unauthenticated floor, knowledge, and handoff endpoints returned 401 |
 | Live administrator pilot setup | Not completed | Saved setup password was rejected; no pilot business/agent was inserted |
-| Real Ollama model inference | **Not verified/enabled on production** | Linux gateway endpoint and secret are still needed |
+| Ollama setup automation | 7 installer tests passed as part of the 49-test suite | Publisher files/checksum availability verified online; binary/model downloads mocked in tests |
+| Real Ollama model inference | **Not verified/enabled on production** | Linux machine setup, gateway endpoint, and secret are still needed |
 | Native mobile installation | Not verified on physical devices | Chromium PWA/offline behavior was verified |
 
 Design previews retained in the working environment and shared in the conversation:
@@ -138,7 +141,7 @@ The isolated Neon branch `milestone2-validation` is retained for development val
 ### Next actions
 
 1. **Use the current administrator password.** Sign in and choose **Agent floor → Add an agent**, or create a clearly labelled pilot business first. The original private setup password should not be assumed valid.
-2. **Run Ollama on the user's Linux machine.** Install/pull the model and run the authenticated gateway following [the Linux guide](docs/linux-inference.md).
+2. **Set up the user's Linux machine.** The user confirmed that it is not set up yet. From the cloned project root, run `python3 scripts/setup_ollama.py` following [the Linux guide](docs/linux-inference.md). It prepares rootless Ollama, verifies a local response, starts the protected bridge/temporary tunnel, and creates a private Render settings file. This command has not been run on the user's machine.
 3. **Connect the Linux bridge to Render.** Supply a reachable HTTPS base URL and store the matching bridge token directly in Render secrets. Then set `AI_PROVIDER=bridge` and deploy the configuration. Do not send or commit the token.
 4. **Verify actual inference.** Check connectivity in the Inference screen, run one approved conversation, inspect grounding/references and token totals, and confirm performance on the actual Linux hardware.
 5. **Run a small business pilot.** Add real, approved business facts, exercise consented lead capture and human handoff, and collect usability feedback.
@@ -179,6 +182,7 @@ All entries below are from **2026-11-13**. Exact individual clock times were not
 | Milestone 2 | Original floor, knowledge/citations, contact capture, handoff, Linux bridge | [PR #3](https://github.com/temcwilliams/AIAGENTSAAS/pull/3), 42 tests passed |
 | Milestone 2 deployment | Release live, PostgreSQL schema updated | `16bc5403a06c8ae716c7fcff3b0adda07259f671`, `dep-dbrjnelckfvc73efg3tg`, schema `0004` |
 | Ongoing tracking | This canonical progress document and repository update instructions added | Documentation-only update; no application deployment needed |
+| Ollama connection preparation | User confirmed Linux host is not set up. Added guided setup and tests; official Linux publisher asset names/checksums checked | 49 tests passed; hosted AI remains disabled pending execution on the user's machine and Render configuration |
 
 ## How this file will be maintained
 
@@ -189,3 +193,9 @@ All entries below are from **2026-11-13**. Exact individual clock times were not
 - Keep resolved history, but ensure the top status and remaining-action list reflect the latest evidence.
 - Never include secrets or private account files. Source code, screenshots, and credentials have different handling requirements.
 - A documentation-only update does not imply or require a new production deployment.
+
+### Latest Ollama setup check
+
+The read-only setup doctor reported that this temporary development workspace has no Ollama or Cloudflare connector installed and only approximately 0.67 GiB free storage. The installer requires at least 6 GiB free to avoid starting a download it cannot complete. This workspace has not been used as a production inference host. No model was downloaded, no live Ollama inference was claimed, and no paid cloud model was selected.
+
+The actual remaining handoff is to run the setup on the user's Linux computer/server, keep it online, and copy the resulting three private environment settings into Render. The script does not transmit credentials or deploy Render automatically. No application redeployment is needed merely to publish the installer.
