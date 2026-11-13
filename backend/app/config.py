@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     ai_provider: Literal["local", "cloud", "disabled"] = "local"
     openai_base_url: str = "http://127.0.0.1:11434/v1"
     openai_api_key: str = ""
+    owner_setup_token_hash: str = ""
     session_hours: int = Field(default=12, ge=1, le=168)
     chat_requests_per_hour: int = Field(default=60, ge=1, le=10000)
 

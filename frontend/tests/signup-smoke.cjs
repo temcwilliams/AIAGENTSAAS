@@ -1,0 +1,47 @@
+const assert=require('node:assert/strict');
+const {chromium}=require('playwright');
+(async()=>{
+ const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:process.env.PW_DISABLE_SANDBOX==='1'?['--no-sandbox']:[]});
+ try{
+  const page=await browser.newPage({viewport:{width:1280,height:900}});
+  const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  const base='http://localhost:3192';
+  const suffix=Date.now();
+  await page.goto(base);
+  await page.getByRole('button',{name:'Create account',exact:true}).click();
+  await page.getByLabel('Business name',{exact:true}).fill('Signup Test Business');
+  await page.getByLabel('Email address').fill(`client-${suffix}@example.com`);
+  await page.getByLabel('Password',{exact:true}).fill('Browser-password-123!');
+  await page.getByLabel('Confirm password',{exact:true}).fill('Different-password-123!');
+  await page.getByRole('button',{name:'Create account',exact:true}).click();
+  await page.getByRole('alert').filter({hasText:'Your passwords do not match.'}).waitFor();
+  await page.getByLabel('Confirm password',{exact:true}).fill('Browser-password-123!');
+  await page.getByRole('button',{name:'Create account',exact:true}).click();
+  await page.getByRole('button',{name:'Account security',exact:true}).waitFor();
+  assert.equal(await page.getByRole('button',{name:'Business settings',exact:true}).count(),0);
+  assert.equal(await page.getByLabel('Business',{exact:true}).inputValue()!=='',true);
+  await page.getByRole('button',{name:'Sign out',exact:true}).click();
+  await page.getByRole('button',{name:'Create account',exact:true}).click();
+  await page.getByLabel('Business name',{exact:true}).fill('Duplicate');
+  await page.getByLabel('Email address').fill(`client-${suffix}@example.com`);
+  await page.getByLabel('Password',{exact:true}).fill('Browser-password-123!');
+  await page.getByLabel('Confirm password',{exact:true}).fill('Browser-password-123!');
+  await page.getByRole('button',{name:'Create account',exact:true}).click();
+  await page.getByRole('alert').filter({hasText:'already exists'}).waitFor();
+  await page.getByText('Have an owner setup code?',{exact:true}).click();
+  await page.getByLabel('Owner setup code',{exact:true}).fill('test-only-owner-code');
+  assert.equal(await page.getByLabel('Owner setup code',{exact:true}).inputValue(),'test-only-owner-code');
+  const owner=await browser.newPage();
+  await owner.goto(base+'/#owner-setup=test-only-owner-code');
+  await owner.getByRole('heading',{name:'Create your account.'}).waitFor();
+  assert.equal(owner.url(),base+'/');
+  await owner.getByLabel('Business name',{exact:true}).fill('Platform Owner');
+  await owner.getByLabel('Email address').fill(`owner-${suffix}@example.com`);
+  await owner.getByLabel('Password',{exact:true}).fill('Owner-password-123!');
+  await owner.getByLabel('Confirm password',{exact:true}).fill('Owner-password-123!');
+  await owner.getByRole('button',{name:'Create account',exact:true}).click();
+  await owner.getByRole('button',{name:'Business settings',exact:true}).waitFor();
+  assert.deepEqual(errors,[]);
+  console.log('Signup browser smoke passed: button, confirmation validation, client signup, tenant selection, duplicate errors, manual owner code, private owner link, owner dashboard.');
+ }finally{await browser.close();}
+})().catch(error=>{console.error(error);process.exit(1)});
