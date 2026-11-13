@@ -1,0 +1,54 @@
+# Free local deployment. Compatible with Podman Compose and Docker Compose.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-agent_studio}
+      POSTGRES_DB: ${POSTGRES_DB:-agent_studio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run python3 scripts/init-local.py first}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+  migrate:
+    build: ./backend
+    environment: &backend_environment
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-agent_studio}:${POSTGRES_PASSWORD:?Generate .env first}@db:5432/${POSTGRES_DB:-agent_studio}
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+      AI_PROVIDER: local
+      OPENAI_BASE_URL: http://ollama:11434/v1
+      CHAT_REQUESTS_PER_HOUR: '60'
+    command: [alembic, upgrade, head]
+    depends_on:
+      db:
+        condition: service_healthy
+  api:
+    build: ./backend
+    environment: *backend_environment
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  web:
+    build: ./frontend
+    environment:
+      BACKEND_URL: http://api:8000
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+    ports:
+      - '127.0.0.1:3000:3000'
+    depends_on:
+      - api
+    restart: unless-stopped
+volumes:
+  postgres_data:
+  ollama_data:

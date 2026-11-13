@@ -1,0 +1,50 @@
+# Template only. Applying this Blueprint creates billable infrastructure.
+previews:
+  generation: 'off'
+projects:
+  - name: agent-studio
+    environments:
+      - name: production
+        services:
+          - type: web
+            name: agent-studio-api
+            runtime: python
+            rootDir: backend
+            autoDeployTrigger: 'off'
+            buildCommand: pip install -r requirements.txt
+            preDeployCommand: alembic upgrade head
+            startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 2
+            healthCheckPath: /health
+            envVars:
+              - key: PYTHON_VERSION
+                value: 3.12.10
+              - key: ENVIRONMENT
+                value: production
+              - key: DATABASE_URL
+                sync: false
+              - key: DATABASE_URL_UNPOOLED
+                sync: false
+              - key: APP_ORIGIN
+                sync: false
+              - key: CHAT_REQUESTS_PER_HOUR
+                value: "60"
+              - key: AI_PROVIDER
+                value: cloud
+              - key: OPENAI_BASE_URL
+                value: https://api.openai.com/v1
+              - key: OPENAI_API_KEY
+                sync: false
+          - type: web
+            name: agent-studio-web
+            runtime: node
+            rootDir: frontend
+            autoDeployTrigger: 'off'
+            buildCommand: npm ci && npm run build
+            startCommand: npm start -- --port $PORT
+            envVars:
+              - key: NODE_VERSION
+                value: 22.16.0
+              - key: BACKEND_URL
+                sync: false
+              - key: APP_ORIGIN
+                sync: false
