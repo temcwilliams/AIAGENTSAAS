@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends libstdc++6 && r
 COPY --from=web /usr/local/bin/node /usr/local/bin/node
 WORKDIR /app
 COPY backend/requirements.txt ./backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt && useradd --create-home app
+RUN pip install --no-cache-dir --upgrade pip==26.3 && pip install --no-cache-dir -r backend/requirements.txt && useradd --create-home app
 COPY --chown=app:app backend/app ./backend/app
 COPY --chown=app:app backend/migrations ./backend/migrations
 COPY --chown=app:app backend/alembic.ini ./backend/alembic.ini

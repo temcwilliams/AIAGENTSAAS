@@ -165,6 +165,7 @@ def main():
     token=ensure_token(state/'bridge.token')
     python=state/'venv/bin/python'
     if not python.exists():subprocess.run([sys.executable,'-m','venv',str(state/'venv')],check=True)
+    subprocess.run([str(python),'-m','pip','install','--upgrade','pip==26.3'],check=True)
     subprocess.run([str(python),'-m','pip','install','-r',str(ROOT/'backend/requirements.txt')],check=True)
     children=[];logs=[]
     def start(command,name,env=None):

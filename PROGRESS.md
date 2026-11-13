@@ -1,9 +1,11 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-13, 17:49 UTC**  
+Last updated: **2026-11-13, 18:18 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
+
+**Security work in progress:** an independent local red-team review confirmed request-body memory bounds, global password-spray/resource limits, and synchronous chat-lock availability issues. Fixes have passed local dependency audits and regression checks; this security release is **not yet deployed**. Strix tools repeatedly returned authentication prompts after reconnection; no Strix scan, credit purchase, or credit-consuming run was started. npm audit and pip-audit each report zero known vulnerabilities after the dependency updates. This is not a completed external penetration test.
 
 **Agent Meadow is deployed and healthy.** Milestone 1 and the Milestone 2 application features are live. Live AI inference is **not enabled**: the user's Linux Ollama bridge still needs to be connected.
 
@@ -20,7 +22,7 @@ Maintained as an ongoing project log. Read this file when starting or resuming w
 | Latest verified live deployment | `dep-dbrjnelckfvc73efg3tg` |
 | Automatic deployments | Disabled; application releases are deployed manually |
 | Hosted AI | `AI_PROVIDER=disabled` |
-| Latest complete backend suite | **49 tests passed** |
+| Latest complete backend suite | **65 tests passed** (includes 16 local red-team regressions) |
 | Milestone 3 | [Six-workstream plan](docs/MILESTONE_3_PLAN.md) prepared for review; implementation not started |
 | Guided Linux setup | [Setup script](scripts/setup_ollama.py) ready; user still needs to run it on their Linux machine |
 | Initial administrator | Created through one-time owner setup; initial sign-in was verified |
@@ -112,7 +114,7 @@ The public hostname retains the original service name; the application, browser 
 
 | Area | Result | Scope / limit |
 |---|---|---|
-| Backend tests | **49 passed** | One existing upstream Starlette/AnyIO deprecation warning; no failing tests |
+| Backend tests | **65 passed** | One upstream TestClient/httpx deprecation warning; no failing tests |
 | Frontend production build | Passed | Includes TypeScript validation |
 | GitHub checks | Passed for the Milestone 2 release | PR #3 merged |
 | SQLite migration round trips | Passed | Includes populated-data preservation and full downgrade/reapply in disposable databases |
@@ -205,3 +207,11 @@ All entries below are from **2026-11-13**. Exact individual clock times were not
 The read-only setup doctor reported that this temporary development workspace has no Ollama or Cloudflare connector installed and only approximately 0.67 GiB free storage. The installer requires at least 6 GiB free to avoid starting a download it cannot complete. This workspace has not been used as a production inference host. No model was downloaded, no live Ollama inference was claimed, and no paid cloud model was selected.
 
 The actual remaining handoff is to run the setup on the user's Linux computer/server, keep it online, and copy the resulting three private environment settings into Render. The script does not transmit credentials or deploy Render automatically. No application redeployment is needed merely to publish the installer.
+
+### Security review — verified locally, release pending
+
+An independent local red-team review found availability/storage issues and dependency advisories. Implemented bounds before JSON parsing (64,000 bytes on both API layers), one concurrent Argon2 operation per backend worker, a shared 30/minute login budget, nonwaiting PostgreSQL conversation locks with retryable 409 responses, off-event-loop synchronous database work, and a 120/hour per-business conversation creation budget. Existing per-email and tenant controls remain enforced. Upgraded Next.js to 15.5.29 with patched PostCSS/sharp overrides; FastAPI/Starlette, pytest, and build-tool pip versions were patched. No schema migration or credential changes are required.
+
+Latest completed full suite: **65 passed**, including 16 adversarial regressions, with one upstream TestClient deprecation warning. Frontend body helper: **3 passed**. npm audit and pip-audit report **zero known vulnerabilities** in the checked lockfile/installed environment. SQLite migration upgrade/downgrade/reapply passed. Creation-budget tests, final frontend production build, TypeScript validation, and pip dependency compatibility checks passed. PostgreSQL lock-contention tests compile the real query and simulate driver errors; they are not live PostgreSQL attack evidence. No real inference or production account mutations were used.
+
+Strix remained blocked by repeated authentication prompts after reconnection; no Strix pentest was launched and no credits were spent. This local review is not a comprehensive external penetration test. Free-hosting capacity, account recovery/email verification, long-term retention, and monitoring remain outstanding as already recorded.

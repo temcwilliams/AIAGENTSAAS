@@ -1,4 +1,5 @@
-fastapi==0.115.12
+fastapi==0.162.7
+starlette==1.10.0
 uvicorn[standard]==0.34.2
 SQLAlchemy==2.0.40
 psycopg[binary]==3.2.6
@@ -6,4 +7,4 @@ alembic==1.15.2
 pydantic-settings==2.9.1
 argon2-cffi==23.1.0
 httpx==0.28.1
-pytest==8.3.5
+pytest==9.0.3
