@@ -11,8 +11,10 @@ from .schemas import Credentials, ClientCreate, BusinessInput, AgentInput, ChatI
 from .security import current_user, admin, tenant, hasher, verify, digest, DUMMY_HASH
 from . import ai
 from .limits import consume
+from .registration import router as registration_router
 
 app = FastAPI(title="Agent Studio API", version="1.0.0")
+app.include_router(registration_router)
 
 @app.middleware("http")
 async def security_headers(request: Request, call_next):

@@ -90,3 +90,8 @@ class RateLimitBucket(Base):
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     count: Mapped[int] = mapped_column(default=0)
     reset_at: Mapped[datetime]
+
+class OwnerSetup(Base):
+    __tablename__ = "owner_setup"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    completed_at: Mapped[datetime]
