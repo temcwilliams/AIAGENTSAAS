@@ -1,4 +1,4 @@
-# Agent Studio · PWA and free local edition
+# Agent Meadow · PWA and free local edition
 
 A multi-tenant AI agent SaaS starter with admin/client roles, business dashboards, configurable agents, test chat, leads, conversation history, token tracking, and account-security controls. It now runs on **free, open-source software with no required cloud account, paid API, or subscription**.
 

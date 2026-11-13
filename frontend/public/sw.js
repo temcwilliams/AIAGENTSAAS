@@ -1,5 +1,5 @@
 /* Only public offline assets are cached. Never persist authenticated pages or API data. */
-const CACHE = 'agent-studio-public-v1';
+const CACHE = 'agent-meadow-public-v1';
 const PUBLIC_ASSETS = ['/offline.html', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(PUBLIC_ASSETS)));
@@ -7,7 +7,7 @@ self.addEventListener('install', event => {
 });
 self.addEventListener('activate', event => {
   event.waitUntil(Promise.all([
-    caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('agent-studio-public-') && key !== CACHE).map(key => caches.delete(key)))),
+    caches.keys().then(keys => Promise.all(keys.filter(key => (key.startsWith('agent-studio-public-') || key.startsWith('agent-meadow-public-')) && key !== CACHE).map(key => caches.delete(key)))),
     self.clients.claim(),
   ]));
 });

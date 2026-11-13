@@ -23,7 +23,7 @@ export default function AuthPanel({busy,error,submit,clearError}:Props){
     submit(signup?'/auth/register':'/auth/login',data);
   }
   return <main className="min-h-screen grid place-items-center p-6"><section className="panel w-full max-w-md">
-    <div className="text-emerald-300 text-xl mb-8">◈ Agent Studio</div>
+    <div className="text-emerald-300 text-xl mb-8">◈ Agent Meadow</div>
     <h1 className="text-3xl font-semibold">{signup?'Create your account.':'Welcome back.'}</h1>
     <p className="text-slate-400 mt-3 mb-7">{signup?(setupToken?'Set up your platform owner account.':'Get your own business workspace in minutes.'):'Sign in to your agent workspace.'}</p>
     <form onSubmit={onSubmit}>
@@ -34,7 +34,7 @@ export default function AuthPanel({busy,error,submit,clearError}:Props){
       {(confirmError||error)&&<p role="alert" className="text-red-300 mt-4">{confirmError||error}</p>}
       <button disabled={busy} className="btn w-full mt-6">{busy?(signup?'Creating account…':'Signing in…'):(signup?'Create account':'Sign in →')}</button>
     </form>
-    <div className="border-t border-slate-700 mt-6 pt-6 text-center"><p className="text-sm text-slate-400 mb-3">{signup?'Already have an account?':'New to Agent Studio?'}</p><button type="button" disabled={busy} className="quiet w-full" onClick={changeMode}>{signup?'Back to sign in':'Create account'}</button></div>
+    <div className="border-t border-slate-700 mt-6 pt-6 text-center"><p className="text-sm text-slate-400 mb-3">{signup?'Already have an account?':'New to Agent Meadow?'}</p><button type="button" disabled={busy} className="quiet w-full" onClick={changeMode}>{signup?'Back to sign in':'Create account'}</button></div>
     {signup&&!ownerLink&&<details className="mt-5 text-sm text-slate-400"><summary className="cursor-pointer">Have an owner setup code?</summary><label htmlFor="owner-code">Owner setup code</label><input id="owner-code" type="password" autoComplete="off" maxLength={256} value={setupToken} onChange={event=>setSetupToken(event.target.value)}/></details>}
   </section></main>;
 }

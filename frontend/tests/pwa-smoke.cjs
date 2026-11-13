@@ -22,7 +22,7 @@ const {chromium}=require('playwright');
     await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));
     await page.evaluate(()=>fetch('/api/auth/me'));
     const paths=await page.evaluate(async()=>{
-      const names=(await caches.keys()).filter(key=>key.startsWith('agent-studio-public-'));
+      const names=(await caches.keys()).filter(key=>key.startsWith('agent-meadow-public-'));
       return (await Promise.all(names.map(async name=>(await (await caches.open(name)).keys()).map(request=>new URL(request.url).pathname)))).flat();
     });
     assert.ok(paths.includes('/offline.html'));

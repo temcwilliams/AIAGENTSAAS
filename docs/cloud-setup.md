@@ -2,7 +2,7 @@
 
 > Optional legacy cloud deployment. This path may incur charges. For the free default, use the root README and compose.yaml. Set `AI_PROVIDER=cloud` and `OPENAI_BASE_URL=https://api.openai.com/v1` explicitly when using a paid provider; the current application defaults to local Ollama.
 
-# Agent Studio · Milestone 1
+# Agent Meadow · Milestone 1
 
 A hybrid AI service workspace: the platform administrator manages businesses and agent configurations; client users see only their business's agents, conversations, leads, and usage. Includes a Next.js/TypeScript/Tailwind dashboard and FastAPI REST API backed by Neon PostgreSQL. No infrastructure is provisioned by this repository.
 

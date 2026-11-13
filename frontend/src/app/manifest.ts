@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    id: '/', name: 'Agent Studio', short_name: 'Agent Studio',
+    id: '/', name: 'Agent Meadow', short_name: 'Agent Meadow',
     description: 'Manage your business agents and customer conversations.',
     start_url: '/', scope: '/', display: 'standalone',
     background_color: '#0b1017', theme_color: '#0b1017',

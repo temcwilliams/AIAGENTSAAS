@@ -13,7 +13,7 @@ from . import ai
 from .limits import consume
 from .registration import router as registration_router
 
-app = FastAPI(title="Agent Studio API", version="1.0.0")
+app = FastAPI(title="Agent Meadow API", version="1.0.0")
 app.include_router(registration_router)
 
 @app.middleware("http")
