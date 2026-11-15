@@ -1,11 +1,11 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-13, 18:18 UTC**  
+Last updated: **2026-11-15, 20:10 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
 
-**Security work in progress:** an independent local red-team review confirmed request-body memory bounds, global password-spray/resource limits, and synchronous chat-lock availability issues. Fixes have passed local dependency audits and regression checks; this security release is **not yet deployed**. Strix tools repeatedly returned authentication prompts after reconnection; no Strix scan, credit purchase, or credit-consuming run was started. npm audit and pip-audit each report zero known vulnerabilities after the dependency updates. This is not a completed external penetration test.
+**Security release is live and verified.** [PR #5](https://github.com/temcwilliams/AIAGENTSAAS/pull/5) fixes request-size, authentication resource, conversation locking/storage abuse issues and patches dependency advisories. Independent local red-team regressions and GitHub checks passed. Public health, access protections, request limits, and PWA smoke checks passed after deployment on 2026-11-15. Strix remained blocked by authentication prompts; no Strix scan ran or credits were spent. The 2026-11-13 npm/pip audits reported zero known vulnerabilities after updates; this is not a comprehensive external penetration test.
 
 **Agent Meadow is deployed and healthy.** Milestone 1 and the Milestone 2 application features are live. Live AI inference is **not enabled**: the user's Linux Ollama bridge still needs to be connected.
 
@@ -18,8 +18,8 @@ Maintained as an ongoing project log. Read this file when starting or resuming w
 | Render dashboard | [Service dashboard](https://dashboard.render.com/web/srv-dbriv0l6e07s73bs7p7g) |
 | Database | Neon project `aiagentsaas`, **Free** organization plan |
 | Live database migration | `0004` |
-| Latest verified live application commit | `16bc5403a06c8ae716c7fcff3b0adda07259f671` |
-| Latest verified live deployment | `dep-dbrjnelckfvc73efg3tg` |
+| Latest verified live application commit | `832faa0c9b5936a70436ba7b706f14e43f1d50d1` |
+| Latest verified live deployment | `dep-dbt120dckfvc73cfh0d0` |
 | Automatic deployments | Disabled; application releases are deployed manually |
 | Hosted AI | `AI_PROVIDER=disabled` |
 | Latest complete backend suite | **65 tests passed** (includes 16 local red-team regressions) |
@@ -116,15 +116,15 @@ The public hostname retains the original service name; the application, browser 
 |---|---|---|
 | Backend tests | **65 passed** | One upstream TestClient/httpx deprecation warning; no failing tests |
 | Frontend production build | Passed | Includes TypeScript validation |
-| GitHub checks | Passed for the Milestone 2 release | PR #3 merged |
+| GitHub checks | Passed for security release | PR #5 merged; frontend/API jobs and both push/PR runs succeeded |
 | SQLite migration round trips | Passed | Includes populated-data preservation and full downgrade/reapply in disposable databases |
 | PostgreSQL migration | Passed on isolated Neon branch | Generated migration SQL applied; original row counts unchanged |
 | Production schema | Verified at `0004` | Application startup migrations completed on Render |
 | Browser workflows | Passed locally | Knowledge → cited response → consented lead → handoff → takeover → human reply; disposable data and a test-only model server |
 | Floor responsiveness | Passed in Chromium | Desktop and mobile, with no horizontal overflow |
-| Live service | Healthy | Public `/health` returned 200 |
+| Live service | Healthy after security deployment | Public `/health` returned 200; Render deploy reached live |
 | Live frontend | Verified served | Bundle contains Meadow Commons, knowledge, and handoff interfaces |
-| Live endpoint protection | Verified | Unauthenticated floor, knowledge, and handoff endpoints returned 401 |
+| Live endpoint protection | Verified after security release | Five protected APIs returned 401; untrusted-Origin write returned 403; one 65KB request returned 413 before authentication |
 | Live administrator pilot setup | Not completed | Saved setup password was rejected; no pilot business/agent was inserted |
 | Ollama setup automation | 7 installer tests passed as part of the 49-test suite | Publisher files/checksum availability verified online; binary/model downloads mocked in tests |
 | Real Ollama model inference | **Not verified/enabled on production** | Linux machine setup, gateway endpoint, and secret are still needed |
@@ -172,7 +172,7 @@ The user requested that account recovery, business onboarding, website widget, l
 
 ## Release and decision history
 
-All entries below are from **2026-11-13**. Exact individual clock times were not recorded for every early step.
+The table below records work from **2026-11-13**. Later dated updates follow this table. Exact individual clock times were not recorded for every early step.
 
 | Stage | Work / outcome | Evidence |
 |---|---|---|
@@ -208,10 +208,22 @@ The read-only setup doctor reported that this temporary development workspace ha
 
 The actual remaining handoff is to run the setup on the user's Linux computer/server, keep it online, and copy the resulting three private environment settings into Render. The script does not transmit credentials or deploy Render automatically. No application redeployment is needed merely to publish the installer.
 
-### Security review — verified locally, release pending
+### 2026-11-13 — security review and local verification
 
 An independent local red-team review found availability/storage issues and dependency advisories. Implemented bounds before JSON parsing (64,000 bytes on both API layers), one concurrent Argon2 operation per backend worker, a shared 30/minute login budget, nonwaiting PostgreSQL conversation locks with retryable 409 responses, off-event-loop synchronous database work, and a 120/hour per-business conversation creation budget. Existing per-email and tenant controls remain enforced. Upgraded Next.js to 15.5.29 with patched PostCSS/sharp overrides; FastAPI/Starlette, pytest, and build-tool pip versions were patched. No schema migration or credential changes are required.
 
 Latest completed full suite: **65 passed**, including 16 adversarial regressions, with one upstream TestClient deprecation warning. Frontend body helper: **3 passed**. npm audit and pip-audit report **zero known vulnerabilities** in the checked lockfile/installed environment. SQLite migration upgrade/downgrade/reapply passed. Creation-budget tests, final frontend production build, TypeScript validation, and pip dependency compatibility checks passed. PostgreSQL lock-contention tests compile the real query and simulate driver errors; they are not live PostgreSQL attack evidence. No real inference or production account mutations were used.
 
 Strix remained blocked by repeated authentication prompts after reconnection; no Strix pentest was launched and no credits were spent. This local review is not a comprehensive external penetration test. Free-hosting capacity, account recovery/email verification, long-term retention, and monitoring remain outstanding as already recorded.
+
+### 2026-11-15 — security release resumed
+
+GitHub confirmed [PR #5](https://github.com/temcwilliams/AIAGENTSAAS/pull/5) is merged at `832faa0c9b5936a70436ba7b706f14e43f1d50d1`. Both branch push and pull-request workflow runs completed successfully. The existing Free Render service still served the previous release. Started manual deployment `dep-dbt120dckfvc73cfh0d0` of the merged security commit in the previously approved **Ai agent SaaS** workspace. Deployment is building; public smoke checks are pending. No new services, paid plans, model calls, or credential changes were requested.
+
+### 2026-11-15 — security deployment verified
+
+Deployment `dep-dbt120dckfvc73cfh0d0` reached **live** at 20:09:22 UTC, serving merged commit `832faa0c9b5936a70436ba7b706f14e43f1d50d1` on the existing **Free** service. Build and startup succeeded. No new schema revision, credentials, paid plan, or real model call was required. Recent Render error-level logs were empty during verification.
+
+Live Chromium smoke checks passed: sign-in/Create account screen navigation; HTTP 200 health; HTTP 401 on auth/me, businesses, floor, knowledge, and handoffs without a session; HTTP 413 on one 65KB request; Agent Meadow standalone manifest/icons; no-store service-worker headers; public-only offline/icon caches; offline fallback and recovery; no browser exceptions. A separate HTTP request with an untrusted Origin returned 403. No live account was created, no customer password was used, and no authenticated data was changed. An initial separate HTTP-client path was refused/timed out; verification succeeded through Chromium and subsequent HTTP checks.
+
+[Security review](docs/SECURITY_REVIEW.md) records the fixed findings and assessment limits. The earlier 65-test backend suite (including 16 local red-team regressions), 3 frontend request-body tests, build/type checks and migration round trip passed; GitHub frontend/API checks also passed. No new Strix scan or credit spending occurred. Ollama inference remains disabled pending the user Linux setup. This progress-only follow-up does not require another deployment.
