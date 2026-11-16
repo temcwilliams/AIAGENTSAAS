@@ -21,3 +21,10 @@ Use a Render Static Site backed by GitHub, GitLab, or Bitbucket:
 - No environment variables or backend service required
 
 The interface can be public; access to the actual AI is controlled by your Ollama network/proxy. Never place server tokens in the static files or build-time environment variables. After deployment use the actual `https://…onrender.com` origin in OLLAMA_ORIGINS. Ollama itself runs on your server, separately from this static frontend.
+
+## Coding workspace
+Open **Coding** after connecting Ollama. Relay selects the first recognized coding model from the server's `/api/tags` list, retaining a previously chosen coding model while it remains installed. Recognized name families include Qwen Coder, DeepSeek Coder, Code Llama, StarCoder, CodeGemma, Codestral, Devstral, Granite Code, CodeQwen, WizardCoder, OpenCoder, Stable Code, and Replit Code. Detection uses model names, not a performance benchmark; custom aliases can be chosen manually in the model menu. After installing another model on the server, reconnect to reload the model list.
+
+When no coding family is found, the tab clearly identifies the current fallback model. It does not download models. Chat and Coding have separate conversation histories, drafts, and model selections. Switching tabs restores your Chat model; switching is blocked during a response or connection check. Existing conversations remain in Chat. Coding requests receive a coding system instruction, and fenced code blocks have Copy buttons; generated code is displayed as text and is never executed by Relay.
+
+Run `node tests/coding.test.cjs` from this directory for model-detection, tab-selection, fallback, legacy-history, and mocked request coverage. Live Ollama and browser/device behavior still need verification with a configured server.
