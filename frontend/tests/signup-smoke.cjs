@@ -1,3 +1,4 @@
+// Read-only smoke check: public and legacy signup are disabled.
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 (async()=>{
@@ -5,46 +6,27 @@ const {chromium}=require('playwright');
  try{
   const page=await browser.newPage({viewport:{width:1280,height:900}});
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
-  const base='http://localhost:3192';
-  const suffix=Date.now();
+  const base=process.env.PWA_TEST_URL||'http://localhost:3192';
   await page.goto(base);
-  await page.getByRole('button',{name:'Create account',exact:true}).click();
-  await page.getByLabel('Business name',{exact:true}).fill('Signup Test Business');
-  await page.getByLabel('Email address').fill(`client-${suffix}@example.com`);
-  await page.getByLabel('Password',{exact:true}).fill('Browser-password-123!');
-  await page.getByLabel('Confirm password',{exact:true}).fill('Different-password-123!');
-  await page.getByRole('button',{name:'Create account',exact:true}).click();
-  await page.getByRole('alert').filter({hasText:'Your passwords do not match.'}).waitFor();
-  await page.getByLabel('Confirm password',{exact:true}).fill('Browser-password-123!');
-  await page.getByRole('button',{name:'Create account',exact:true}).click();
-  await page.getByRole('button',{name:'Account security',exact:true}).waitFor();
-  assert.equal(await page.getByRole('button',{name:'Business settings',exact:true}).count(),0);
-  assert.equal(await page.getByLabel('Business',{exact:true}).inputValue()!=='',true);
-  await page.getByRole('button',{name:'Sign out',exact:true}).click();
-  await page.getByRole('button',{name:'Create account',exact:true}).click();
-  await page.getByLabel('Business name',{exact:true}).fill('Duplicate');
-  await page.getByLabel('Email address').fill(`client-${suffix}@example.com`);
-  await page.getByLabel('Password',{exact:true}).fill('Browser-password-123!');
-  await page.getByLabel('Confirm password',{exact:true}).fill('Browser-password-123!');
-  await page.getByRole('button',{name:'Create account',exact:true}).click();
-  await page.getByRole('alert').filter({hasText:'already exists'}).waitFor();
-  await page.getByText('Have an owner setup code?',{exact:true}).click();
-  await page.getByLabel('Owner setup code',{exact:true}).fill('test-only-owner-code');
-  assert.equal(await page.getByLabel('Owner setup code',{exact:true}).inputValue(),'test-only-owner-code');
-  await page.goto(base+'/#owner-setup=test-only-owner-code');
+  await page.getByRole('button',{name:'Sign in →',exact:true}).waitFor();
+  async function assertClosed(){
+   assert.equal(await page.getByRole('button',{name:/create account/i}).count(),0);
+   assert.equal(await page.getByLabel('Business name',{exact:true}).count(),0);
+   assert.equal(await page.getByLabel('Confirm password',{exact:true}).count(),0);
+   const link=page.getByRole('link',{name:'Request access by email',exact:true});
+   assert.equal(await link.getAttribute('href'),'mailto:tmcwilliams2010@outlook.com?subject=Agent%20Meadow%20account%20request');
+  }
+  await assertClosed();
+  // Old setup links are scrubbed without revealing a registration form.
+  await page.goto(base+'/#owner-setup=test-only-retired-code');
   await page.waitForFunction(()=>!window.location.hash);
-  assert.equal(page.url(),base+'/');
-  const owner=await browser.newPage();
-  await owner.goto(base+'/#owner-setup=test-only-owner-code');
-  await owner.getByRole('heading',{name:'Create your account.'}).waitFor();
-  assert.equal(owner.url(),base+'/');
-  await owner.getByLabel('Business name',{exact:true}).fill('Platform Owner');
-  await owner.getByLabel('Email address').fill(`owner-${suffix}@example.com`);
-  await owner.getByLabel('Password',{exact:true}).fill('Owner-password-123!');
-  await owner.getByLabel('Confirm password',{exact:true}).fill('Owner-password-123!');
-  await owner.getByRole('button',{name:'Create account',exact:true}).click();
-  await owner.getByRole('button',{name:'Business settings',exact:true}).waitFor();
+  await assertClosed();
+  await page.evaluate(()=>{window.location.hash='owner-setup=second-test-only-retired-code'});
+  await page.waitForFunction(()=>!window.location.hash);
+  await assertClosed();
+  await page.setViewportSize({width:390,height:844});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);
   assert.deepEqual(errors,[]);
-  console.log('Signup browser smoke passed: button, confirmation validation, client signup, tenant selection, duplicate errors, manual owner code, private owner link, owner dashboard.');
+  console.log('PASS: sign-in only, owner contact email, no public signup fields/buttons, retired owner links cleared on load/hashchange, mobile width, no browser exceptions. No account created.');
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1)});

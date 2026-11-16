@@ -14,7 +14,7 @@ The existing original Meadow Commons design remains the basis of floor personali
 
 - Milestones 1 and 2 are live: tenant isolation, accounts, agents, knowledge/citations, contact capture, human handoff, original floor, and PWA support.
 - The complete test baseline is **49 passing backend tests**. These are existing results; no tests were run merely to write this plan.
-- Public signup creates isolated client businesses; there is no email verification or email-based recovery yet.
+- Policy updated 2026-11-16: businesses email the platform owner for access; public signup is disabled. There is no email verification or email-based recovery yet.
 - Clients currently have limited dashboard rights; platform administrators configure agents and handle human replies.
 - Chat is currently an authenticated dashboard playground. There is **no public website widget**.
 - Handoff and leads exist, but staff assignment, per-user unread notifications, and pipeline stages do not.
@@ -58,7 +58,7 @@ Preserve the global `admin`/`client` distinction. Add explicit business membersh
 | Manager | Responder rights plus business onboarding, lead operations, floor customization, and permitted staff assignment |
 | Platform administrator | Manage businesses, grant scoped roles, configure/publish agents, and administer the platform |
 
-Existing client accounts migrate to Viewer unless the platform owner explicitly grants additional rights. A future new-business signup may create its founding business membership as Manager **only for the new business created in that transaction**; callers cannot choose a business or privileged role. This is an intentional new onboarding policy to review before implementation.
+Existing client accounts migrate to Viewer unless the platform owner explicitly grants additional rights. Public signup remains disabled under the owner-approved access policy. Future onboarding must start with an account provisioned by the platform owner; it cannot grant access through a public signup form. Any later change to that policy requires the owner’s explicit decision.
 
 Model keys, platform roles, and agent publication remain owner-controlled. Shared authorization helpers and tenant-bearing foreign keys must be implemented before broadening any existing client endpoint.
 
