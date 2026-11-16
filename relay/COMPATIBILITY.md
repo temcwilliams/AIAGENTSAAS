@@ -28,3 +28,7 @@ Installation is optional. Firefox desktop and browsers without PWA installation 
 ## Verification limits
 
 Local Node VM tests cover model selection, tab behavior, malicious content, literal clipboard copying and denial, pending-connection guards, touch/desktop keyboard behavior, blocked/full storage, ID fallbacks, dialog fallbacks, and header/body deadlines. These are mocked browser APIs, not real Safari/Firefox/Chromium runs. Public Render asset checks verify publication only. Physical-device installation, real cross-browser layout/offline behavior, and live Ollama/proxy inference remain unverified.
+
+## Foreground voice
+
+Voice input uses SpeechRecognition/webkitSpeechRecognition when available. Safari/Chrome support depends on OS, language, settings, and recognition-service connectivity; do not infer support solely from browser name. Other browsers may lack the API. The app offers keyboard-dictation fallback and explicit errors. Browser speech recognition may process audio remotely. Speech playback uses speechSynthesis where available; read-aloud can be disabled. iOS may require a fresh tap to resume recognition/playback. Locking the phone or leaving the app stops the PWA voice session; no background listening support is claimed. Preference cookies do not change these restrictions.

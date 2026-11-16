@@ -34,3 +34,13 @@ Run `node tests/coding.test.cjs` from this directory for model-detection, tab-se
 See [device/browser support and verification limits](COMPATIBILITY.md) and [the Coding red-team report](SECURITY-REVIEW-CODING.md). Install help is also available inside the app. Current major desktop and mobile browsers are the support target; physical operating-system testing is not claimed.
 
 Run `node tests/coding.test.cjs`, `node tests/compat.test.cjs`, and `node tests/red-team-coding.cjs` for the 19 local behavior, compatibility, and adversarial cases.
+
+## PWA voice and preference cookies
+
+No App Store or Xcode is required for the PWA. Connect Ollama, tap **Start voice**, read the browser-recognition notice, then explicitly start the conversation. Where browser speech recognition is available, recognized words are submitted to Ollama; completed replies can be read aloud, then listening resumes. Stop, navigation, page hiding, or errors end voice. Pending voice requests are aborted on Stop and stale callbacks cannot resume listening. No microphone activation occurs automatically on page load or from cookies. Speech input may use the browser vendor's recognition service; this is not an on-device privacy guarantee. Unsupported browsers can use keyboard dictation.
+
+Voice is foreground-only. Cookies do not enable locked-screen/background microphone access or Siri wake words. Browser/device voice and physical iPhone behavior are unverified; the native project remains separate historical source, not the active PWA deployment path.
+
+The `relay_preferences` first-party cookie stores only tab, Chat/Coding model names, and read-aloud preference. It has a 180-day Max-Age, Path=/, SameSite=Strict and Secure on HTTPS; no Domain attribute is set. It is a JavaScript-readable preference cookie, not an authentication/session cookie. Chat messages and proxy tokens are excluded. Chat history/server address remain localStorage and token remains memory-only. **Cookies & privacy** explains this and resets the cookie. Blocked or malformed cookies fall back safely to in-memory defaults. Preferences do not sync devices.
+
+Run `node tests/voice.test.cjs` alongside the earlier suites (25 local cases in total). Voice integration uses browser APIs and requires real-device checks for permissions, provider availability, speech synthesis user-activation rules, and background suspension.
