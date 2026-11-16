@@ -21,12 +21,12 @@ if(typeof document!=='undefined'){
     onStop(){if(voiceSending&&busy)controller.abort()},
     onState(message,active){$('voiceStatus').textContent=message;$('voiceToggle').textContent=active?'Stop voice':'Start voice';$('voiceToggle').setAttribute('aria-pressed',String(active));$('voiceNav').textContent=active?'◉ Voice active':'◉ Voice conversation'}
   });
-  $('voiceNav').onclick=()=>{if(relayVoice.active){relayVoice.stop();return}openDialog($('voiceGuide'));document.body.classList.remove('sidebar-open')};
+  $('voiceNav').onclick=()=>{if(relayVoice.active){relayVoice.stop();return}openDialog($('voiceGuide'));setSidebar(false)};
   $('closeVoiceGuide').onclick=()=>closeDialog($('voiceGuide'));
   $('voiceToggle').onclick=()=>{if(relayVoice.active)relayVoice.stop();else openDialog($('voiceGuide'))};
   $('voiceStart').onclick=()=>{closeDialog($('voiceGuide'));relayVoice.start()};
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&relayVoice.active)relayVoice.stop('Voice stopped because Relay left the foreground. Reopen Relay and tap Start.')});
   window.addEventListener('pagehide',()=>relayVoice.stop());
   $('cookieInfo').onclick=()=>openDialog($('privacyGuide'));$('closePrivacyGuide').onclick=()=>closeDialog($('privacyGuide'));
-  $('clearPreferences').onclick=()=>{preferences.set({mode:'chat',chatModel:'',codingModel:'',readAloud:true});readback.checked=true;toast('Preference cookie reset. Chat history and server settings were kept.')};
+  $('clearPreferences').onclick=()=>{preferences.set({theme:'dark',mode:'chat',chatModel:'',codingModel:'',readAloud:true});if(typeof applyTheme==='function')applyTheme('dark');readback.checked=true;toast('Preference cookie reset. Chat history and server settings were kept.')};
 }

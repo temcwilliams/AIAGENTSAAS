@@ -32,3 +32,7 @@ Local Node VM tests cover model selection, tab behavior, malicious content, lite
 ## Foreground voice
 
 Voice input uses SpeechRecognition/webkitSpeechRecognition when available. Safari/Chrome support depends on OS, language, settings, and recognition-service connectivity; do not infer support solely from browser name. Other browsers may lack the API. The app offers keyboard-dictation fallback and explicit errors. Browser speech recognition may process audio remotely. Speech playback uses speechSynthesis where available; read-aloud can be disabled. iOS may require a fresh tap to resume recognition/playback. Locking the phone or leaving the app stops the PWA voice session; no background listening support is claimed. Preference cookies do not change these restrictions.
+
+## Browser UI verification, 2026-11-16
+
+Headless Chromium checks passed at 1440×900, 390×844, 375×667, and 320×568: no welcome/body overflow, theme toggle/reload persistence, mobile drawer close/backdrop/Escape/destination dismissal and inert background, all four dialogs closing after scroll and reopening at top, backdrop/Escape dismissal, one modal at a time, retained long-chat scrolling with composer visible, and no browser exceptions. This supersedes the earlier statement that no real browser UI test had run; speech permissions, real Ollama, Safari, and physical device installation remain unverified.

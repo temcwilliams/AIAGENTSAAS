@@ -1,7 +1,7 @@
 'use strict';
 function cleanPreferences(value={}){
   const model=v=>typeof v==='string'&&v.length<=200?v:'';
-  return {mode:value?.mode==='coding'?'coding':'chat',chatModel:model(value?.chatModel),codingModel:model(value?.codingModel),readAloud:value?.readAloud!==false};
+  return {theme:value?.theme==='light'?'light':'dark',mode:value?.mode==='coding'?'coding':'chat',chatModel:model(value?.chatModel),codingModel:model(value?.codingModel),readAloud:value?.readAloud!==false};
 }
 function createPreferences(doc,secure=true){
   let memory=cleanPreferences();

@@ -10,5 +10,18 @@ async function timedFetch(url,options={},timeout=15000,consume){
   const abort=new AbortController();const parent=options.signal;const cancel=()=>abort.abort();if(parent?.aborted)cancel();else parent?.addEventListener('abort',cancel,{once:true});let expired=false;const timer=setTimeout(()=>{expired=true;cancel()},timeout);
   try{const response=await fetch(url,{...options,signal:abort.signal});return consume?await consume(response):response}catch(error){if(expired&&!parent?.aborted)throw Error('Server connection timed out. Check its address and network access.');throw error}finally{clearTimeout(timer);/* Keep parent cancellation wired while its response body streams. */}
 }
-function openDialog(dialog){if(typeof dialog.showModal==='function')dialog.showModal();else{dialog.setAttribute('open','');dialog.setAttribute('aria-modal','true')}}
-function closeDialog(dialog){if(typeof dialog.close==='function')dialog.close();else dialog.removeAttribute('open')}
+const dialogFocus=new WeakMap();
+function openDialog(dialog){
+  if(typeof setSidebar==='function')setSidebar(false);
+  if(typeof document!=='undefined'){
+    dialogFocus.set(dialog,document.activeElement);
+    document.querySelectorAll('dialog[open]').forEach(other=>{if(other!==dialog&&other.tagName==='DIALOG')closeDialog(other)});
+  }
+  if(dialog.open)return;dialog.scrollTop=0;
+  if(typeof dialog.showModal==='function')dialog.showModal();else{dialog.setAttribute('open','');dialog.setAttribute('aria-modal','true')}
+  dialog.scrollTop=0;dialog.querySelector?.('.dialog-head button')?.focus?.({preventScroll:true});
+}
+function closeDialog(dialog){
+  if(typeof dialog.close==='function')dialog.close();else dialog.removeAttribute('open');
+  dialogFocus.get(dialog)?.focus?.();dialogFocus.delete(dialog);
+}

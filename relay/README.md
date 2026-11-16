@@ -41,6 +41,16 @@ No App Store or Xcode is required for the PWA. Connect Ollama, tap **Start voice
 
 Voice is foreground-only. Cookies do not enable locked-screen/background microphone access or Siri wake words. Browser/device voice and physical iPhone behavior are unverified; the native project remains separate historical source, not the active PWA deployment path.
 
-The `relay_preferences` first-party cookie stores only tab, Chat/Coding model names, and read-aloud preference. It has a 180-day Max-Age, Path=/, SameSite=Strict and Secure on HTTPS; no Domain attribute is set. It is a JavaScript-readable preference cookie, not an authentication/session cookie. Chat messages and proxy tokens are excluded. Chat history/server address remain localStorage and token remains memory-only. **Cookies & privacy** explains this and resets the cookie. Blocked or malformed cookies fall back safely to in-memory defaults. Preferences do not sync devices.
+The `relay_preferences` first-party cookie stores only tab, Chat/Coding model names, theme, and read-aloud preference. It has a 180-day Max-Age, Path=/, SameSite=Strict and Secure on HTTPS; no Domain attribute is set. It is a JavaScript-readable preference cookie, not an authentication/session cookie. Chat messages and proxy tokens are excluded. Chat history/server address remain localStorage and token remains memory-only. **Cookies & privacy** explains this and resets the cookie. Blocked or malformed cookies fall back safely to in-memory defaults. Preferences do not sync devices.
 
 Run `node tests/voice.test.cjs` alongside the earlier suites (26 local cases in total). Voice integration uses browser APIs and requires real-device checks for permissions, provider availability, speech synthesis user-activation rules, and background suspension.
+
+## Appearance, menus, and scrolling
+
+Relay opens with a navy/cyan dark theme. The header theme button switches to light mode and remembers the choice in the preference cookie. The sidebar profile button also switches themes. The theme uses real colors and native control color schemes rather than a page-wide inversion filter.
+
+On mobile, close navigation with ×, a backdrop tap, Escape, or choosing a destination. Closed navigation is inert; opening it makes the background workspace inert. Dialogs have sticky close controls, outside-click/Escape dismissal, reset scroll when reopened, and close any previous dialog. Initial focus goes to Close so opening settings does not immediately summon a mobile keyboard.
+
+The welcome screen fits the checked desktop/phone sizes without page or chat overflow. Long conversations and code retain scrolling inside their content areas; the composer stays in view. Decorative scrollbars are hidden in the conversation and history regions.
+
+Browser regressions: start a static server for `dist` (e.g. `python -m http.server 4173 --directory dist` from `relay/`). With Playwright and its Chromium installed in your development environment, run `node tests/ui.browser.cjs`. `RELAY_TEST_URL` selects another URL, and `RELAY_BROWSER_EXECUTABLE` selects an existing Chromium binary. The suite checks four viewport sizes, theme persistence, drawer dismissal/inert state, all four dialogs, close visibility after scrolling, one-modal-at-a-time behavior, and long-chat layout. Physical Safari/iPhone verification is still pending.
