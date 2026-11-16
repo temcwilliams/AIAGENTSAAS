@@ -11,7 +11,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
     assert.equal(await page.locator('#sidebar').evaluate(e=>e.inert),true);
     await page.click('#menu');assert.equal(await page.locator('#sidebar').evaluate(e=>e.inert),false);assert.equal(await page.locator('.main').evaluate(e=>e.inert),true);await page.click('#closeSidebar');assert.equal(await page.getAttribute('#menu','aria-expanded'),'false');
     await page.click('#menu');await page.click('#sidebarBackdrop',{position:{x:viewport.width-10,y:viewport.height/2}});assert.equal(await page.getAttribute('#menu','aria-expanded'),'false');
-    await page.click('#menu');await page.click('#codingNav');assert.equal(await page.getAttribute('#menu','aria-expanded'),'false');assert.equal(await page.locator('#sidebar').evaluate(e=>e.inert),true);
+    await page.click('#menu');await page.click('#codingNav');assert.equal(await page.getAttribute('#menu','aria-expanded'),'false');assert.equal(await page.locator('#sidebar').evaluate(e=>e.inert),true);assert.equal(await page.locator('#chat').evaluate(e=>e.scrollHeight<=e.clientHeight+1),true,'coding welcome overflow');
     await page.click('#menu');await page.keyboard.press('Escape');assert.equal(await page.getAttribute('#menu','aria-expanded'),'false');
    }
    for(const [trigger,dialog,close] of [['settingsButton','settings','closeSettings'],['installHelp','installGuide','closeInstallGuide'],['cookieInfo','privacyGuide','closePrivacyGuide'],['voiceToggle','voiceGuide','closeVoiceGuide']]){
