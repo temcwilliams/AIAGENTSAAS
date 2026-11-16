@@ -33,6 +33,7 @@ function renderMessage(node,content){
   }
 }
 function selectModeModel(){
+  if(!models.length){updateCodingNotice();return}
   const coding=chooseCodingModel(models,modeModels.coding);
   const chosen=mode==='coding'?(coding||(models.includes(modeModels.coding)?modeModels.coding:modeModels.chat)):modeModels.chat;
   if(models.includes(chosen))$('model').value=chosen;
@@ -45,7 +46,7 @@ function updateCodingNotice(coding=chooseCodingModel(models,modeModels.coding)){
 $('model').onchange=()=>{stopVoiceForNavigation();modeModels[mode]=$('model').value;savePreferences();updateCodingNotice()};
 function switchMode(next){
   stopVoiceForNavigation();if(busy||connecting)return toast('Finish the current response or connection check before switching tabs.');
-  if(next!==mode){views[mode]={active,draft:$('input').value};modeModels[mode]=$('model').value;mode=next;active=views[mode].active;if(!chats.some(c=>c.id===active))active=null;$('input').value=views[mode].draft;selectModeModel();updateModeUI();render();savePreferences()}
+  if(next!==mode){views[mode]={active,draft:$('input').value};if(models.length)modeModels[mode]=$('model').value;mode=next;active=views[mode].active;if(!chats.some(c=>c.id===active))active=null;$('input').value=views[mode].draft;selectModeModel();updateModeUI();render();savePreferences()}
   document.body.classList.remove('sidebar-open');$('input').focus();
 }
 function updateModeUI(){
