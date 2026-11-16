@@ -1,5 +1,6 @@
 'use strict';
 function setSidebar(open){
+  if(open&&typeof stopVoiceForNavigation==='function')stopVoiceForNavigation();
   document.body.classList.toggle('sidebar-open',open);
   const backdrop=document.getElementById('sidebarBackdrop'),menu=document.getElementById('menu'),sidebar=document.getElementById('sidebar');
   const mobile=window.innerWidth<=760,hadFocus=sidebar?.contains?.(document.activeElement);

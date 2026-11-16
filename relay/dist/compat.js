@@ -12,6 +12,7 @@ async function timedFetch(url,options={},timeout=15000,consume){
 }
 const dialogFocus=new WeakMap();
 function openDialog(dialog){
+  if(typeof stopVoiceForNavigation==='function')stopVoiceForNavigation();
   if(typeof setSidebar==='function')setSidebar(false);
   if(typeof document!=='undefined'){
     dialogFocus.set(dialog,document.activeElement);
