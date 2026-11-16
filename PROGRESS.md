@@ -1,11 +1,11 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-16, 17:11 UTC**  
+Last updated: **2026-11-16, 17:17 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
 
-**Account access change in progress:** the user requested removal of public signup. Sign-in now links to the user-approved contact address, `tmcwilliams2010@outlook.com`; public and legacy owner registration are disabled in code before database access or hashing. Approved businesses will be created by the owner through **Business settings**. The full 65-test backend suite, frontend build/type checks, 3 body-limit tests, and browser closed-signup smoke check passed locally. Publication/deployment verification is pending; the previous release is still live.
+**Account access is owner-approved only, deployed and verified.** Public Create account and browser owner setup are removed. Businesses use **Request access by email** at `tmcwilliams2010@outlook.com`; the owner provisions approved businesses/clients through **Business settings**. The retired signup endpoint returns 403 before database/password work. Existing sign-in remains available. Independent red-team tests found no signup/provisioning bypass; the complete backend suite now has 68 passing tests. Strix is no longer on the active checklist.
 
 **Security release is live and verified.** [PR #5](https://github.com/temcwilliams/AIAGENTSAAS/pull/5) fixes request-size, authentication resource, conversation locking/storage abuse issues and patches dependency advisories. Independent local red-team regressions and GitHub checks passed. Public health, access protections, request limits, and PWA smoke checks passed after deployment on 2026-11-15. Strix remained blocked by authentication prompts; no Strix scan ran or credits were spent. The 2026-11-13 npm/pip audits reported zero known vulnerabilities after updates; this is not a comprehensive external penetration test.
 
@@ -20,11 +20,11 @@ Maintained as an ongoing project log. Read this file when starting or resuming w
 | Render dashboard | [Service dashboard](https://dashboard.render.com/web/srv-dbriv0l6e07s73bs7p7g) |
 | Database | Neon project `aiagentsaas`, **Free** organization plan |
 | Live database migration | `0004` |
-| Latest verified live application commit | `832faa0c9b5936a70436ba7b706f14e43f1d50d1` |
-| Latest verified live deployment | `dep-dbt120dckfvc73cfh0d0` |
+| Latest verified live application commit | `4f139c64808643fff725c86021dc520294c9d976` |
+| Latest verified live deployment | `dep-dbtjk7ei0phs73di7410` |
 | Automatic deployments | Disabled; application releases are deployed manually |
 | Hosted AI | `AI_PROVIDER=disabled` |
-| Latest complete backend suite | **65 tests passed** (includes 16 local red-team regressions) |
+| Latest complete backend suite | **68 tests passed** (includes 19 local red-team regressions) |
 | Milestone 3 | [Six-workstream plan](docs/MILESTONE_3_PLAN.md) prepared for review; implementation not started |
 | Guided Linux setup | [Setup script](scripts/setup_ollama.py) ready; user still needs to run it on their Linux machine |
 | Initial administrator | Created through one-time owner setup; initial sign-in was verified |
@@ -64,9 +64,9 @@ The public hostname retains the original service name; the application, browser 
 - [x] Sign-out-everywhere action.
 - [x] Configurable business-wide chat attempt limits, including failed provider attempts.
 - [x] Workspace state resets and protection against late refresh results from a previously selected business.
-- [x] Public **Create account** form was implemented earlier; now retired in code at the user’s request (deployment pending). Sign-in offers an email request link instead.
-- [x] Only administrators can provision business/client accounts; public registration returns 403 in code, including legacy owner tokens (deployment pending).
-- [x] Historical one-time owner signup created the initial administrator; browser owner registration is now retired in code. Existing owner claims are retained; fresh installations use offline bootstrap.
+- [x] Public **Create account** form was implemented earlier; now retired in code at the user’s request (deployed 2026-11-16). Sign-in offers an email request link instead.
+- [x] Only administrators can provision business/client accounts; public registration returns 403 in code, including legacy owner tokens (deployed 2026-11-16).
+- [x] Historical one-time owner signup created the initial administrator; browser owner registration is now retired and deployed. Existing owner claims are retained; fresh installations use offline bootstrap.
 - [x] Retired owner-link fragments are scrubbed without exposing a registration form.
 - [x] Initial administrator created at the user's request, with generated credentials delivered privately; the verification session was signed out.
 
@@ -116,9 +116,9 @@ The public hostname retains the original service name; the application, browser 
 
 | Area | Result | Scope / limit |
 |---|---|---|
-| Backend tests | **65 passed** | One upstream TestClient/httpx deprecation warning; no failing tests |
+| Backend tests | **68 passed** | One upstream TestClient/httpx deprecation warning; no failing tests |
 | Frontend production build | Passed | Includes TypeScript validation |
-| GitHub checks | Passed for security release | PR #5 merged; frontend/API jobs and both push/PR runs succeeded |
+| GitHub checks | Passed for owner-approved access release | PR #6 merged; frontend/API jobs and both push/PR runs succeeded. Additional red-team test follow-up pending publication |
 | SQLite migration round trips | Passed | Includes populated-data preservation and full downgrade/reapply in disposable databases |
 | PostgreSQL migration | Passed on isolated Neon branch | Generated migration SQL applied; original row counts unchanged |
 | Production schema | Verified at `0004` | Application startup migrations completed on Render |
@@ -237,3 +237,13 @@ The user requested removing Create account so businesses email the owner for acc
 The user also requested leaving Strix alone; it is removed from the active checklist and will not be retried unless requested. Earlier authentication failures remain historical evidence, not an action item.
 
 Local verification passed for owner-provisioned access: **65 backend tests** (7 replacement signup/provisioning cases), **3 frontend body-limit tests**, production build and TypeScript checks, and Chromium closed-signup smoke checks (no Create account controls, correct email link, retired setup links scrubbed on load/hash change, mobile width, no browser exceptions). No real email was sent and no production account was created.
+
+### 2026-11-16 — access release and additional red-team review
+
+[PR #6](https://github.com/temcwilliams/AIAGENTSAAS/pull/6) merged as `4f139c64808643fff725c86021dc520294c9d976` after both GitHub push/PR workflows passed. Started deployment `dep-dbtjk7ei0phs73di7410` on the existing Free Render service; live verification is pending. The user additionally requested an independent red-team attack/review of the access change. A local reviewer is examining direct/legacy signup, account provisioning, authentication and tenant bypass using disposable fixtures; no Strix, paid scans, real emails, or production account mutations are authorized for that review. Findings and test outcomes are pending.
+
+### 2026-11-16 — owner-approved access live; red-team verification
+
+Deployment `dep-dbtjk7ei0phs73di7410` reached **live** at 17:16:31 UTC for merged commit `4f139c64808643fff725c86021dc520294c9d976`, on the existing Free service. Live Chromium checks passed: no Create account controls or signup fields, correct email link/address, retired owner fragments scrubbed on initial navigation and hash changes, mobile layout without horizontal overflow, and no browser exceptions. Public health returned 200; retired signup returned 403; five protected APIs returned 401; oversized input returned 413. Manifest/icons, public-only service-worker caches, offline fallback and recovery passed. Recent error-level Render logs were empty. No real email was sent and no production account was created or modified.
+
+An independent local red-team reviewer added **3 new attack regression tests**, covering nine path/transport combinations (canonical, trailing slash, encoded path; text, form, multipart), HTTP method overrides, matching legacy owner code with an admin session, spoofed role/tenant/authentication headers, provisioning field overposting, attempted session injection and cross-tenant access. **No bypass was found**. Database/hash tripwires confirmed registration performs neither action. The new tests use disposable SQLite accounts; they are not a live authenticated penetration test. Full suite: **68 passed**, including all previous security regressions and the new cases; one upstream TestClient/httpx deprecation warning. The runtime code needs no further fix or redeployment from this review; test/report publication is pending.

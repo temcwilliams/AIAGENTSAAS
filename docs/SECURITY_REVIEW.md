@@ -37,3 +37,11 @@ npm audit
 ```
 
 Run backend tests from `backend/` as described in the main README. For Python dependency advisory checks, install the free `pip-audit` tool in a development virtual environment and run `pip-audit`; audits require access to public advisory services. Test fixtures and model responses are disposable/mocked. Do not point automated exploit tests at production accounts.
+
+## 2026-11-16 follow-up — owner-approved account access
+
+At the user’s request, public signup and browser owner setup were retired. Accounts are now provisioned by the platform administrator after email contact. The registration endpoint unconditionally rejects requests before database access, request schema validation, or password hashing; old owner codes cannot reopen it. Existing data and sign-in are preserved, and initial-owner bootstrap for fresh installations remains an offline operator action.
+
+An independent local red-team reviewer found **no bypass** in three added regression tests. Checks exercised canonical/encoded/trailing paths across text, form and multipart bodies; alternate methods and method overrides; configured matching legacy owner codes while authenticated as admin; client role/tenant/header spoofing; account field overposting; session injection; and newly provisioned client tenant/admin isolation. A separate seven-case access suite verifies disabled registration without an administrator/database access and successful admin-provisioned client sign-in. Full backend suite: **68 passed** with one upstream TestClient deprecation warning.
+
+Live checks after the Free Render deployment verified the email-only access interface, scrubbed legacy fragments, disabled signup (403), protected APIs (401), request byte limits (413), health (200), and PWA/offline behavior. No production accounts were created or modified and no email was sent. These tests do not establish universal vulnerability absence or replace a comprehensive external assessment. Strix is excluded from the active checklist at the user’s request; no Strix tools or paid scans were used for this review.
