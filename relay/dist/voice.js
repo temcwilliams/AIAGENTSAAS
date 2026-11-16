@@ -17,7 +17,7 @@ if(typeof document!=='undefined'){
   const readback=document.getElementById('readAloud');readback.checked=preferences.get().readAloud;readback.onchange=()=>preferences.set({readAloud:readback.checked});
   relayVoice=new RelayVoiceController({Recognition:window.SpeechRecognition||window.webkitSpeechRecognition,synthesis:window.speechSynthesis,Utterance:window.SpeechSynthesisUtterance,language:navigator.language||'en-US',isVisible:()=>!document.hidden,readAloud:()=>readback.checked,
     canStart(){if(busy||connecting)throw Error('Finish the current reply or connection check first.');if(!models.length)throw Error('Connect your Ollama server before starting voice.');if($('input').value.trim())throw Error('Send or clear your draft before starting voice.');return true},
-    async send(text){if(busy||connecting)throw Error('The workspace is busy. Tap Start when ready.');voiceSending=true;try{$('input').value=text;return await $('composer').onsubmit({preventDefault(){}})}finally{voiceSending=false}},
+    async send(text){if(busy||connecting)throw Error('The workspace is busy. Tap Start when ready.');if($('input').value.trim())throw Error('Your typed draft was kept. Send or clear it before using voice again.');voiceSending=true;try{$('input').value=text;return await $('composer').onsubmit({preventDefault(){}})}finally{voiceSending=false}},
     onStop(){if(voiceSending&&busy)controller.abort()},
     onState(message,active){$('voiceStatus').textContent=message;$('voiceToggle').textContent=active?'Stop voice':'Start voice';$('voiceToggle').setAttribute('aria-pressed',String(active));$('voiceNav').textContent=active?'◉ Voice active':'◉ Voice conversation'}
   });

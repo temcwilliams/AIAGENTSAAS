@@ -54,3 +54,9 @@ On mobile, close navigation with ×, a backdrop tap, Escape, or choosing a desti
 The welcome screen fits the checked desktop/phone sizes without page or chat overflow. Long conversations and code retain scrolling inside their content areas; the composer stays in view. Decorative scrollbars are hidden in the conversation and history regions.
 
 Browser regressions: start a static server for `dist` (e.g. `python -m http.server 4173 --directory dist` from `relay/`). With Playwright and its Chromium installed in your development environment, run `node tests/ui.browser.cjs`. `RELAY_TEST_URL` selects another URL, and `RELAY_BROWSER_EXECUTABLE` selects an existing Chromium binary. The suite checks four viewport sizes, theme persistence, drawer dismissal/inert state, all four dialogs, close visibility after scrolling, one-modal-at-a-time behavior, and long-chat layout. Physical Safari/iPhone verification is still pending.
+
+## Composer behavior
+
+Send is enabled only for nonblank drafts when no response/connection is in progress. A separate Stop button cancels the active reply. The input stays editable while a reply is running; Enter then preserves the draft rather than aborting the response. Desktop Enter sends when ready, Shift+Enter adds a line; touch keyboards keep Enter for newlines and use Send. IME composition events (including keyCode 229) never trigger submission. Typed drafts cannot be replaced by a late browser-voice result. Text input grows to a bounded height and then scrolls internally; clearing/submitting resets its size.
+
+`node tests/composer.browser.cjs` (same Playwright/server setup as the UI suite) checks sending, empty drafts, separate cancellation, follow-up draft retention, composition, multiline input, failed-response recovery, voice/draft collision, and bounded long text at desktop, tablet, and two phone sizes with mocked Ollama responses. Real Ollama and physical device keyboards remain unverified.
