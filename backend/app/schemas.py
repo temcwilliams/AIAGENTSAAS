@@ -29,11 +29,6 @@ class PasswordChange(BaseModel):
     current_password: str = Field(min_length=1, max_length=128)
     new_password: str = Field(min_length=12, max_length=128)
 
-class Registration(Credentials):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=False)
-    business_name: str = Field(min_length=1,max_length=120,pattern=r"\S")
-    setup_token: str = Field(default="",max_length=256)
-
 class KnowledgeInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     title: str = Field(min_length=1,max_length=200,pattern=r"\S")

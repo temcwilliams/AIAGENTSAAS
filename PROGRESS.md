@@ -1,9 +1,11 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-15, 20:10 UTC**  
+Last updated: **2026-11-16, 17:11 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
+
+**Account access change in progress:** the user requested removal of public signup. Sign-in now links to the user-approved contact address, `tmcwilliams2010@outlook.com`; public and legacy owner registration are disabled in code before database access or hashing. Approved businesses will be created by the owner through **Business settings**. The full 65-test backend suite, frontend build/type checks, 3 body-limit tests, and browser closed-signup smoke check passed locally. Publication/deployment verification is pending; the previous release is still live.
 
 **Security release is live and verified.** [PR #5](https://github.com/temcwilliams/AIAGENTSAAS/pull/5) fixes request-size, authentication resource, conversation locking/storage abuse issues and patches dependency advisories. Independent local red-team regressions and GitHub checks passed. Public health, access protections, request limits, and PWA smoke checks passed after deployment on 2026-11-15. Strix remained blocked by authentication prompts; no Strix scan ran or credits were spent. The 2026-11-13 npm/pip audits reported zero known vulnerabilities after updates; this is not a comprehensive external penetration test.
 
@@ -62,10 +64,10 @@ The public hostname retains the original service name; the application, browser 
 - [x] Sign-out-everywhere action.
 - [x] Configurable business-wide chat attempt limits, including failed provider attempts.
 - [x] Workspace state resets and protection against late refresh results from a previously selected business.
-- [x] Public **Create account** button and form with password confirmation, duplicate-email errors, and automatic sign-in.
-- [x] Ordinary signup creates an isolated client business and cannot choose an administrator role or join an existing tenant.
-- [x] Private one-time owner signup, backed by a unique database claim. Public first visitors do not become administrators.
-- [x] Same-tab owner-link handling and removal of the setup fragment from browser history.
+- [x] Public **Create account** form was implemented earlier; now retired in code at the user’s request (deployment pending). Sign-in offers an email request link instead.
+- [x] Only administrators can provision business/client accounts; public registration returns 403 in code, including legacy owner tokens (deployment pending).
+- [x] Historical one-time owner signup created the initial administrator; browser owner registration is now retired in code. Existing owner claims are retained; fresh installations use offline bootstrap.
+- [x] Retired owner-link fragments are scrubbed without exposing a registration form.
 - [x] Initial administrator created at the user's request, with generated credentials delivered privately; the verification session was signed out.
 
 **Current access limitation:** the originally generated administrator password was rejected during Milestone 2 live verification. The cause was not assumed, the password was not reset, and authentication was not bypassed. The user should sign in with their current password. A later account-recovery feature is still outstanding.
@@ -227,3 +229,11 @@ Deployment `dep-dbt120dckfvc73cfh0d0` reached **live** at 20:09:22 UTC, serving 
 Live Chromium smoke checks passed: sign-in/Create account screen navigation; HTTP 200 health; HTTP 401 on auth/me, businesses, floor, knowledge, and handoffs without a session; HTTP 413 on one 65KB request; Agent Meadow standalone manifest/icons; no-store service-worker headers; public-only offline/icon caches; offline fallback and recovery; no browser exceptions. A separate HTTP request with an untrusted Origin returned 403. No live account was created, no customer password was used, and no authenticated data was changed. An initial separate HTTP-client path was refused/timed out; verification succeeded through Chromium and subsequent HTTP checks.
 
 [Security review](docs/SECURITY_REVIEW.md) records the fixed findings and assessment limits. The earlier 65-test backend suite (including 16 local red-team regressions), 3 frontend request-body tests, build/type checks and migration round trip passed; GitHub frontend/API checks also passed. No new Strix scan or credit spending occurred. Ollama inference remains disabled pending the user Linux setup. This progress-only follow-up does not require another deployment.
+
+### 2026-11-16 — owner-provisioned accounts requested
+
+The user requested removing Create account so businesses email the owner for access, reducing automated signup/storage abuse. They explicitly supplied `tmcwilliams2010@outlook.com` for the public **Request access by email** link. Removed public signup UI and retired `POST /auth/register` with an unconditional 403 before database dependencies, schema validation, password hashing, session issuance, or owner-token processing. Existing sign-in and administrator business/client provisioning remain available. Replaced signup regression tests and the old account-creating browser smoke script with closed-signup checks; updated setup documentation and the future onboarding plan to preserve owner approval. Verification and deployment pending; no existing accounts were removed and no migration is needed.
+
+The user also requested leaving Strix alone; it is removed from the active checklist and will not be retried unless requested. Earlier authentication failures remain historical evidence, not an action item.
+
+Local verification passed for owner-provisioned access: **65 backend tests** (7 replacement signup/provisioning cases), **3 frontend body-limit tests**, production build and TypeScript checks, and Chromium closed-signup smoke checks (no Create account controls, correct email link, retired setup links scrubbed on load/hash change, mobile width, no browser exceptions). No real email was sent and no production account was created.
