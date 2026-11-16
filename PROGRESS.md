@@ -1,6 +1,6 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-16, 17:17 UTC**  
+Last updated: **2026-11-16, 17:19 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
@@ -118,7 +118,7 @@ The public hostname retains the original service name; the application, browser 
 |---|---|---|
 | Backend tests | **68 passed** | One upstream TestClient/httpx deprecation warning; no failing tests |
 | Frontend production build | Passed | Includes TypeScript validation |
-| GitHub checks | Passed for owner-approved access release | PR #6 merged; frontend/API jobs and both push/PR runs succeeded. Additional red-team test follow-up pending publication |
+| GitHub checks | Passed for owner-approved access release | PR #6 merged; frontend/API jobs and both push/PR runs succeeded. PR #7 red-team test/report follow-up merged after both push/PR workflows passed |
 | SQLite migration round trips | Passed | Includes populated-data preservation and full downgrade/reapply in disposable databases |
 | PostgreSQL migration | Passed on isolated Neon branch | Generated migration SQL applied; original row counts unchanged |
 | Production schema | Verified at `0004` | Application startup migrations completed on Render |
@@ -246,4 +246,8 @@ Local verification passed for owner-provisioned access: **65 backend tests** (7 
 
 Deployment `dep-dbtjk7ei0phs73di7410` reached **live** at 17:16:31 UTC for merged commit `4f139c64808643fff725c86021dc520294c9d976`, on the existing Free service. Live Chromium checks passed: no Create account controls or signup fields, correct email link/address, retired owner fragments scrubbed on initial navigation and hash changes, mobile layout without horizontal overflow, and no browser exceptions. Public health returned 200; retired signup returned 403; five protected APIs returned 401; oversized input returned 413. Manifest/icons, public-only service-worker caches, offline fallback and recovery passed. Recent error-level Render logs were empty. No real email was sent and no production account was created or modified.
 
-An independent local red-team reviewer added **3 new attack regression tests**, covering nine path/transport combinations (canonical, trailing slash, encoded path; text, form, multipart), HTTP method overrides, matching legacy owner code with an admin session, spoofed role/tenant/authentication headers, provisioning field overposting, attempted session injection and cross-tenant access. **No bypass was found**. Database/hash tripwires confirmed registration performs neither action. The new tests use disposable SQLite accounts; they are not a live authenticated penetration test. Full suite: **68 passed**, including all previous security regressions and the new cases; one upstream TestClient/httpx deprecation warning. The runtime code needs no further fix or redeployment from this review; test/report publication is pending.
+An independent local red-team reviewer added **3 new attack regression tests**, covering nine path/transport combinations (canonical, trailing slash, encoded path; text, form, multipart), HTTP method overrides, matching legacy owner code with an admin session, spoofed role/tenant/authentication headers, provisioning field overposting, attempted session injection and cross-tenant access. **No bypass was found**. Database/hash tripwires confirmed registration performs neither action. The new tests use disposable SQLite accounts; they are not a live authenticated penetration test. Full suite: **68 passed**, including all previous security regressions and the new cases; one upstream TestClient/httpx deprecation warning. The runtime code needs no further fix or redeployment from this review; the test/report follow-up is published in PR #7, with both GitHub push/PR workflow runs successful.
+
+### 2026-11-16 — red-team follow-up published
+
+[PR #7](https://github.com/temcwilliams/AIAGENTSAAS/pull/7) merged the independent attack regressions and review report after both GitHub push/PR workflows passed. There were no additional confirmed runtime vulnerabilities from this review. Production remains the verified PR #6 application commit; this follow-up only changes tests/documentation and requires no extra Render deployment. Current results: **68 backend tests passed**, **3 frontend body-limit tests passed**, build/TypeScript checks passed, closed-signup and PWA live smoke checks passed. Strix remains excluded as requested.
