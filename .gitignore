@@ -12,3 +12,9 @@ node_modules/
 artifacts/private-owner-setup.html
 
 artifacts/agent-meadow-signin.txt
+
+# Generated Relay native build products and personal signing state
+relay-ios/*.xcodeproj/
+relay-ios/build/
+relay-ios/DerivedData/
+*.xcuserstate

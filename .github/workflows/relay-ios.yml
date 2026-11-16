@@ -1,0 +1,30 @@
+name: Relay iOS
+on:
+  push:
+    paths: ['relay-ios/**', '.github/workflows/relay-ios.yml']
+  pull_request:
+    paths: ['relay-ios/**', '.github/workflows/relay-ios.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install project generator
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        working-directory: relay-ios
+        run: xcodegen generate
+      - name: Build for iOS Simulator without signing
+        working-directory: relay-ios
+        run: xcodebuild -project RelayVoice.xcodeproj -scheme RelayVoice -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+      - name: Select simulator
+        run: |
+          simulator=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(v["udid"] for vs in d["devices"].values() for v in vs if "iPhone" in v["name"]))')
+          echo "RELAY_SIMULATOR=$simulator" >> "$GITHUB_ENV"
+      - name: Test connection boundaries and wire format
+        working-directory: relay-ios
+        run: xcodebuild -project RelayVoice.xcodeproj -scheme RelayVoice -destination "platform=iOS Simulator,id=$RELAY_SIMULATOR" CODE_SIGNING_ALLOWED=NO test
