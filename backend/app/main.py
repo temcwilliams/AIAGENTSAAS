@@ -7,9 +7,9 @@ from sqlalchemy.orm import Session as DBSession
 from sqlalchemy.exc import IntegrityError
 from .config import settings
 from .db import get_db, locked_scalar
-from .models import Business, User, Session, LoginAttempt, Agent, Conversation, Message, Usage, Lead, now
+from .models import Business, User, Session, LoginAttempt, Agent, Conversation, Message, Usage, Lead, Membership, ActionToken, now
 from .schemas import Credentials, ClientCreate, BusinessInput, AgentInput, ChatInput, LeadInput, PasswordChange
-from .security import current_user, admin, tenant, hasher, verify, digest, DUMMY_HASH
+from .security import current_user, admin, tenant, hasher, verify, digest, DUMMY_HASH, identity
 from . import ai
 from .knowledge import retrieve
 from .contact_capture import capture
@@ -17,11 +17,15 @@ from .operations import router as operations_router
 from .limits import consume
 from .registration import router as registration_router
 from .request_limits import RequestBodyLimit
+from .accounts import router as accounts_router, revoke_actions
+from .onboarding import router as onboarding_router
 
 app = FastAPI(title="Agent Meadow API", version="1.0.0")
 app.add_middleware(RequestBodyLimit)
 app.include_router(registration_router)
 app.include_router(operations_router)
+app.include_router(accounts_router)
+app.include_router(onboarding_router)
 
 @app.middleware("http")
 async def security_headers(request: Request, call_next):
@@ -58,13 +62,13 @@ def login(data: Credentials, response: Response, db: DBSession=Depends(get_db)):
     db.commit()
     if count > 10: raise HTTPException(429, "Try again in 15 minutes")
     user = db.scalar(select(User).where(User.email == email).with_for_update())
-    valid = verify(data.password, user.password_hash if user else DUMMY_HASH)
-    if not user or not valid: raise HTTPException(401, "Invalid credentials")
+    valid = verify(data.password, user.password_hash if user and not user.disabled else DUMMY_HASH)
+    if not user or user.disabled or not valid: raise HTTPException(401, "Invalid credentials")
     token = secrets.token_urlsafe(48)
     db.add(Session(token_hash=digest(token), user_id=user.id, expires_at=now()+timedelta(hours=settings.session_hours)))
     db.execute(delete(LoginAttempt).where(LoginAttempt.key == key)); db.commit()
     response.set_cookie("session", token, httponly=True, secure=settings.environment == "production", samesite="strict", max_age=settings.session_hours*3600, path="/")
-    return {"id": user.id, "role": user.role, "business_id": user.business_id, "email": user.email}
+    return identity(db,user)
 
 @app.post("/auth/logout", status_code=204)
 def logout(request: Request, response: Response, db: DBSession=Depends(get_db)):
@@ -72,8 +76,8 @@ def logout(request: Request, response: Response, db: DBSession=Depends(get_db)):
     db.commit(); response.delete_cookie("session", path="/")
 
 @app.get("/auth/me")
-def me(user=Depends(current_user)):
-    return {"id": user.id, "email": user.email, "role": user.role, "business_id": user.business_id}
+def me(user=Depends(current_user),db:DBSession=Depends(get_db)):
+    return identity(db,user)
 
 @app.post("/auth/password", status_code=204)
 def change_password(data: PasswordChange, response: Response, user=Depends(current_user), db: DBSession=Depends(get_db)):
@@ -84,6 +88,7 @@ def change_password(data: PasswordChange, response: Response, user=Depends(curre
     if data.current_password == data.new_password:
         raise HTTPException(422, "Choose a different password")
     locked.password_hash = hasher.hash(data.new_password)
+    revoke_actions(db,user.id)
     db.execute(delete(Session).where(Session.user_id == user.id))
     db.commit()
     response.delete_cookie("session", path="/")
@@ -99,7 +104,10 @@ def create_user(data: ClientCreate, db: DBSession=Depends(get_db)):
     if not db.get(Business, data.business_id): raise HTTPException(404, "Business not found")
     user = User(email=data.email.lower().strip(), password_hash=hasher.hash(data.password), role="client", business_id=data.business_id)
     db.add(user)
-    try: db.commit()
+    try:
+        db.flush()
+        db.add(Membership(business_id=data.business_id,user_id=user.id,role=data.business_role))
+        db.commit()
     except IntegrityError:
         db.rollback(); raise HTTPException(409, "Email already exists")
     return {"id": user.id, "email": user.email}

@@ -94,15 +94,15 @@ npm run build
 npm run typecheck
 ```
 
-The suite tests authentication, session expiry/revocation, password changes, admin permissions, tenant isolation, composite database constraints, shared business request limits, conversation/token persistence, failed-provider rollback, and both local/cloud provider adapters. Tests use isolated SQLite databases and mocked AI responses. No paid calls occur. PostgreSQL locking and live Ollama inference require separate integration validation. CI configuration is included under `.github/workflows`.
+The suite tests authentication, session expiry/revocation, password changes and recovery actions, scoped business roles, account disabling, onboarding publication, tenant isolation, composite database constraints, shared request limits, conversation/token persistence, failed-provider rollback, and local/cloud provider adapters. Tests use isolated SQLite databases, an in-memory test mailbox, and mocked AI responses. No paid calls or real email occur. PostgreSQL locking and live Ollama inference require separate integration validation. CI configuration is included under `.github/workflows`.
 
 ## Architecture and security
 
 `backend/app/security.py` handles identity and tenant authorization; `limits.py` owns atomic request limits; `ai.py` isolates inference; `models.py` owns persistence; `schemas.py` validates requests; `main.py` exposes REST endpoints. Next.js UI and same-origin API proxy live under `frontend/src/app`. OpenAPI docs are available at `/docs` on the API when accessed within the container network or through native development.
 
-Passwords use Argon2id. Sessions use random tokens stored only as digests. Public signup and browser owner setup are disabled. Only an authenticated administrator can create businesses and client accounts. Offline admin bootstrap remains available for a new installation without an administrator. All business endpoints enforce tenant authorization and scope resource queries. Admins intentionally manage all businesses. Composite foreign keys reject mixed-tenant references. Writes require the configured Origin. Password changes revoke every session; “sign out everywhere” is available to clients and admins. PostgreSQL locks serialize chat turns. The initial schema and rate-limit migration are included and run before the container API starts.
+Passwords use Argon2id. Sessions and email action tokens are random values stored only as digests. Public signup and browser owner setup are disabled. Only an authenticated administrator can create businesses and client accounts. Offline admin bootstrap remains available for a new installation without an administrator. All business endpoints enforce tenant authorization and scope resource queries. Admins intentionally manage all businesses. Viewer, Responder, and Manager memberships are checked from the database on every request; composite foreign keys reject mixed-tenant references. Writes require the configured Origin. Password changes and successful recovery revoke every session; “sign out everywhere” is available to clients and admins. PostgreSQL locks serialize chat turns. Alembic migrations run before the container API starts.
 
-Leads are manually recorded by admins; performance metrics are request, conversation, lead, and token counts. Email-based recovery, MFA, audit trails, automated retention, and per-tenant token budgets remain future work. Billing, integrations, and a future 3D agent floor should use separate modules and the existing tenant-scoped APIs.
+Leads are manually recorded by admins; performance metrics are request, conversation, lead, and token counts. MFA, audit trails, automated retention, and per-tenant token budgets remain future work. Billing, integrations, and a future 3D agent floor should use separate modules and the existing tenant-scoped APIs.
 
 ## Optional cloud compatibility
 
@@ -120,7 +120,13 @@ For the new **single-service Free Render preview**, see [docs/render-pwa.md](doc
 
 Public account creation is disabled to prevent automated signup abuse. The sign-in page provides **Request access by email** at **tmcwilliams2010@outlook.com**; this opens the visitor's email app and does not submit a server form or automatically create an account. The legacy `POST /auth/register` endpoint always returns 403, including requests with old owner-setup codes. Browser owner-setup links no longer open a registration form. Previously created accounts continue to sign in.
 
-To approve a business, sign in as an administrator, open **Business settings → Create business**, select that business, and use **Give a client access** to enter the client's email and a unique temporary password (12–128 characters). Share it securely and ask the client to change it under **Account security**. Clients cannot provision other accounts or access another business. No email invitation or delivery service is required for this manual process.
+To approve a business, sign in as an administrator and open **Business settings**. Create the business, then either create a manual temporary-password account or—after email delivery is configured—send a single-use setup invitation. Assign Viewer, Responder, or Manager access. Clients cannot provision accounts, grant themselves roles, publish agent configuration, or access another business. Administrators can disable accounts; the final active administrator cannot be disabled.
+
+### Optional email recovery and invitations
+
+Recovery, verification, and invitation screens are included, but delivery defaults to off. Keep `EMAIL_PROVIDER=disabled` unless you have a free HTTPS delivery account and a verified sender. For the built-in production adapter, set `EMAIL_PROVIDER=resend`, store `EMAIL_API_KEY` only as a secret, set `EMAIL_FROM` to the verified sender, and keep `APP_ORIGIN` on the public HTTPS origin. Restart after changing these settings. The application never uses ordinary outbound SMTP, never stores raw action tokens, and reports delivery as unavailable while configuration is incomplete. `EMAIL_PROVIDER=test` is rejected outside the test environment.
+
+Action links expire, are purpose-bound and single-use. Password recovery revokes all sessions for that account. The public forgot-password response does not reveal whether an email address exists. No real message is sent by the automated test suite.
 
 For a fresh installation only, run `python -m app.bootstrap` from `backend/` in a trusted environment connected to its database; it prompts privately for the initial administrator password and refuses when an administrator already exists. The existing deployed owner account does not need to be recreated. The historical `OWNER_SETUP_TOKEN_HASH` setting is ignored by the retired registration endpoint, and migration `0003` is retained for existing database history; no database reset or migration is needed to close signup.
 
@@ -139,6 +145,6 @@ Apply migration `0004` before starting the new version. It preserves existing da
 
 Run `python3 scripts/setup_ollama.py` from the project root on your own Linux machine. It prepares rootless Ollama, pulls the local model, verifies a response and token usage, starts the protected bridge/temporary HTTPS tunnel, and creates a private Render configuration file. It does not change the hosted app or publish credentials automatically. See [the Linux guide](docs/linux-inference.md) for prerequisites and the final Render connection step.
 
-## Next development plan
+## Milestone 3
 
-[Milestone 3 plan](docs/MILESTONE_3_PLAN.md) covers account recovery, onboarding, a public website widget, lead pipeline, team handoff management, and original floor personalization. It is a review plan; implementation has not started.
+[Milestone 3 plan](docs/MILESTONE_3_PLAN.md) covers account recovery, onboarding, a public website widget, lead pipeline, team handoff management, and original floor personalization. Release A implements account access/security and resumable owner-reviewed onboarding. Its migrations are `0005` and `0006`. Release B (widget and lead pipeline) and Release C (team handoff and floor personalization) remain planned.

@@ -1,11 +1,11 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-17, 13:58 UTC**  
+Last updated: **2026-11-17, 14:12 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
 
-**Release A is in progress and NOT deployed (2026-11-17).** The user authorized Milestone 3 phases 1–2 while Linux inference hardware is unavailable. Account security/permissions and onboarding code has been implemented in the coding workspace and passed 92 local backend tests plus frontend build/type checks. PostgreSQL migrations were validated on the isolated development branch. The coding workspace then went offline before final browser results and code publication could be retrieved. Application changes remain uncommitted there; their recovery must be verified when the workspace reconnects. Production remains the owner-approved-access release below. Real email delivery and hosted AI remain disabled.
+**Release A recovered and locally verified (2026-11-17):** the disconnected workspace returned with the account, onboarding, migration, UI and test files intact. The remaining invalid-token storage hardening and nonblank model validation were completed. The full backend suite now passes **93 tests**, and the frontend production build/TypeScript checks pass. Release A is still **not published or deployed**; production remains on schema `0004`. Public signup, real email delivery and hosted AI remain disabled.
 
 **Account access is owner-approved only, deployed and verified.** Public Create account and browser owner setup are removed. Businesses use **Request access by email** at `tmcwilliams2010@outlook.com`; the owner provisions approved businesses/clients through **Business settings**. The retired signup endpoint returns 403 before database/password work. Existing sign-in remains available. Independent red-team tests found no signup/provisioning bypass; the complete backend suite now has 68 passing tests. Strix is no longer on the active checklist.
 
@@ -27,7 +27,7 @@ Maintained as an ongoing project log. Read this file when starting or resuming w
 | Automatic deployments | Disabled; application releases are deployed manually |
 | Hosted AI | `AI_PROVIDER=disabled` |
 | Latest complete backend suite | **68 tests passed** (includes 19 local red-team regressions) |
-| Milestone 3 | [Six-workstream plan](docs/MILESTONE_3_PLAN.md) Release A authorized/in progress; coding workspace offline; not deployed |
+| Milestone 3 | [Six-workstream plan](docs/MILESTONE_3_PLAN.md) prepared for review; implementation not started |
 | Guided Linux setup | [Setup script](scripts/setup_ollama.py) ready; user still needs to run it on their Linux machine |
 | Initial administrator | Created through one-time owner setup; initial sign-in was verified |
 | Pilot business / starter agent | **Not created**; saved setup credentials were rejected during later verification |
@@ -254,32 +254,20 @@ An independent local red-team reviewer added **3 new attack regression tests**, 
 
 [PR #7](https://github.com/temcwilliams/AIAGENTSAAS/pull/7) merged the independent attack regressions and review report after both GitHub push/PR workflows passed. There were no additional confirmed runtime vulnerabilities from this review. Production remains the verified PR #6 application commit; this follow-up only changes tests/documentation and requires no extra Render deployment. Current results: **68 backend tests passed**, **3 frontend body-limit tests passed**, build/TypeScript checks passed, closed-signup and PWA live smoke checks passed. Strix remains excluded as requested.
 
+### 2026-11-17 — Release A authorized
+
+The user authorized account access and onboarding implementation without access to their Linux server. Release A can operate independently of Ollama. Preserve owner-approved access and existing sessions; backfill clients as Viewers, keep initial owners usable without automatically claiming verified email, and provide clear disabled-delivery status until a free HTTPS email provider and verified sender are configured. Build and test migrations before any production schema change.
+
 ### 2026-11-17 — Release A implementation and interrupted verification
 
-The user authorized Milestone 3 Release A (account access/security and business onboarding), independently of Linux/Ollama availability. Public signup remains closed. No real email sending, paid model calls, new paid resources, production password resets, or production migration were performed.
+Release A was implemented locally before the coding environment disconnected: digest-only recovery/setup/verification actions; default-disabled HTTPS email delivery; Viewer/Responder/Manager memberships; account disabling and final-owner protection; versioned tenant onboarding; owner review and idempotent publication; migrations `0005`–`0006`; frontend account/onboarding screens; and targeted tests. Public signup stayed closed, and no real email, model call, production password reset, paid resource, or production migration was used.
 
-Implemented locally, **not published or deployed**:
+Before interruption, **92 backend tests** and the frontend build passed. Populated SQLite migration round trips preserved existing application data. The migrations were also applied transactionally to the isolated Neon `milestone2-validation` branch, where schema `0006` and unchanged baseline row counts were verified; production remained on `0004`. The first local Chromium run's final result could not be retrieved, so it was not counted as passed at that point. A GitHub-only progress commit recorded the interruption while preserving unrelated newer repository changes. The remaining hardening, browser verification, documentation, publication, and deployment were explicitly left pending rather than inferred complete.
 
-- Digest-only reset/setup/verification action tokens, expiry, single-use conditional claims, supersession, session revocation, disabled-account checks, final-active-administrator guard, generic recovery responses, configured-origin fragment links and bounded email attempts.
-- Default-disabled HTTPS email delivery adapter plus an in-memory test mailbox restricted to the test environment. No external mail credential or verified sender is configured; actual email delivery remains an external setup requirement.
-- Viewer/Responder/Manager memberships, Viewer backfill for existing clients, owner-controlled role grants/invitations/account status, manual client access while email is unavailable, and scoped responder handoff rights.
-- Versioned resumable onboarding, tenant-scoped drafts, corrections/review/approval, preview without inference, and transactional/idempotent publication of a managed starter agent and business reference document. Drafts do not change active configuration. Publication is workspace configuration, not a public website widget or inference activation.
-- New frontend recovery/setup/verification, role/account administration, onboarding wizard and review screens; email-off status is explicit. Tests cover tokens, permissions, account state, tenant constraints, draft conflicts, publication retries, and preservation of old data.
+### 2026-11-17 — Release A workspace recovered and verification resumed
 
-Verification completed before interruption:
+The existing coding workspace reconnected and the uncommitted Release A files were recovered. No email connector was needed and no email was read or sent. Completed the pending bounded-storage fix so unknown action-token guesses consume only the shared global bucket rather than creating attacker-selected per-token buckets; valid tokens retain an additional per-token limit. Publication now rejects whitespace-only model names. Added a regression for the bounded invalid-token behavior.
 
-- Full local backend suite: **92 passed**, one upstream TestClient/httpx deprecation warning. This includes 23 new account/onboarding checks and one populated migration test alongside the released 68-test baseline.
-- Frontend production build and TypeScript validation passed.
-- Populated disposable SQLite upgrade/backfill, downgrade/reapply, full migration round trip and foreign-key checks passed; sessions, password hashes, transcripts, leads, existing agent prompts and knowledge survived.
-- Migrations 0005–0006 were generated from the Alembic code and applied transactionally on the existing isolated Neon branch `milestone2-validation` (`br-plain-moon-bf1ia7cc`) in project `aiagentsaas`. Its schema is now **0006**. Baseline/post-migration counts remained unchanged: 1 user, 1 business; zero agents, conversations, messages and knowledge documents. Existing account flags remained active/unverified; no action tokens or drafts were inserted by migration validation. **The production branch was not migrated.**
-- An end-to-end Chromium workflow was started against disposable local preview accounts and test-only action fixtures. Its final result could not be retrieved after the environment disconnected, so it is **not counted as passed**. The fixtures did not represent real email delivery or inference.
+Full backend result: **93 passed**, with one upstream FastAPI TestClient/httpx deprecation warning. The Next.js 15.5.29 production build compiled, type-checked, generated all pages, and completed successfully. The reconnected execution sandbox requires loopback/network namespace permission for the in-memory TestClient; a minimal empty FastAPI app confirmed that environment behavior before the suite was rerun.
 
-Interruption and remaining work:
-
-The ChatGPT coding environment reported `connectivity: offline`; execution tools then returned **No usable execution environment is available**. No environment repair controls or retained diagnostic captures were available through connected tools. Source files in that workspace cannot currently be read or published; their recoverability is not assumed. This progress entry was saved directly through the GitHub connector to preserve the verified status, while keeping unrelated newer repository changes intact.
-
-On reconnection, inspect/recover the uncommitted Release A files under backend/app (accounts, email_delivery, onboarding and existing auth/models/API changes), migrations/versions/0005_accounts.py and 0006_onboarding.py, backend/tests/test_release_a_*.py, frontend/components account-access/onboarding/auth-panel, app/page.tsx, and frontend/tests/release-a-smoke.cjs. Compare against current main before publishing; newer independent repository changes must be preserved.
-
-Before release, finish the identified hardening change so random invalid action-token guesses do not create per-token rate-limit rows (reserve the global limit, check token existence, then reserve the per-token limit before acquiring account locks); validate nonblank publish model input. The attempted patch could not read the first target file after transport closure, so these edits must be checked/applied and tested after recovery. Then rerun affected/full tests, finish browser flows, update environment templates/README/Release A plan and acceptance evidence, publish/review the actual project files, and deploy/verify schema 0006 on the existing Free Render service. Do not reapply migrations blindly to the already validated development branch.
-
-Real email sending still needs a separately configured free HTTPS provider key and verified sender. No email delivery, live model inference, or completed deployment is claimed from adapter/tests alone. Strix remains excluded at the user’s request.
+The Release A Chromium workflow also passed against a fresh disposable localhost-only SQLite database. It verified closed public signup; explicit verification/setup actions with URL-fragment removal; password confirmation; honest disabled-email state; manager draft save/sign-out/resume/submit; owner change request/approval/publication; one managed agent/document; manual client creation; scoped role changes; mobile width; and no browser exceptions. Tokens and accounts were synthetic fixtures, not real delivery or customer data. No external API, real email, production database mutation, or model call was used. Documentation and environment templates were updated locally; publication, GitHub checks, production migration/deployment, and live verification remain pending.
