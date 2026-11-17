@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     chat_requests_per_hour: int = Field(default=60, ge=1, le=10000)
     login_requests_per_minute: int = Field(default=30, ge=1, le=1000)
     conversations_per_hour: int = Field(default=120, ge=1, le=10000)
-    email_provider: Literal['disabled','resend','test'] = 'disabled'
+    email_provider: Literal['disabled','brevo','resend','test'] = 'disabled'
     email_api_key: str = ''
     email_from: str = ''
     mail_requests_per_day: int = Field(default=50, ge=1, le=1000)

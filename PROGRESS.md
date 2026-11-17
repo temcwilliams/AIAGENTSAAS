@@ -7,7 +7,7 @@ Maintained as an ongoing project log. Read this file when starting or resuming w
 
 **Milestone 3 Release A is live and verified (2026-11-17).** [PR #8](https://github.com/temcwilliams/AIAGENTSAAS/pull/8) added secure recovery/setup/verification actions, scoped Viewer/Responder/Manager memberships, account disabling, and resumable owner-reviewed onboarding. GitHub checks, **93 backend tests**, the frontend build, disposable browser workflows, Render health checks, and live public access checks passed. Production is on schema `0006`. Public signup, real email delivery and hosted AI remain disabled.
 
-**Temporary Outlook setup guide is live.** The user asked to connect both existing Outlook accounts to the PWA from an iPad. ChatGPT connector credentials cannot be exported to Agent Meadow, so an administrator-only Business settings panel now links directly to Microsoft Entra registration and explains the safe stopping point. This guide does not enable delivery, access mail, or store Microsoft credentials; it will be removed after the PWA receives its own OAuth authorization.
+**Brevo Free email support is implemented and locally verified; publication/deployment are pending.** The unusable Microsoft Entra guide has been replaced in code with an iPad-friendly Brevo Free setup guide, and the backend now supports Brevo's HTTPS transactional-email API. The user explicitly approved this direction only if it uses no paid features. The current code keeps delivery disabled until a free Brevo account is approved, the Outlook sender is verified, and the API key is stored directly in Render. No real email or Brevo API call has been made.
 
 **Account access is owner-approved only, deployed and verified.** Public Create account and browser owner setup are removed. Businesses use **Request access by email** at `tmcwilliams2010@outlook.com`; the owner provisions approved businesses/clients through **Business settings**. The retired signup endpoint returns 403 before database/password work. Existing sign-in remains available. Independent red-team tests found no signup/provisioning bypass; the complete backend suite now has 68 passing tests. Strix is no longer on the active checklist.
 
@@ -24,8 +24,8 @@ Maintained as an ongoing project log. Read this file when starting or resuming w
 | Render dashboard | [Service dashboard](https://dashboard.render.com/web/srv-dbriv0l6e07s73bs7p7g) |
 | Database | Neon project `aiagentsaas`, **Free** organization plan |
 | Live database migration | `0006` |
-| Latest verified live application commit | `fc62e083f38c027ad8ace3f9894de9b31a72584e` |
-| Latest verified live deployment | `dep-dbu63uou01pc73dpisr0` |
+| Latest verified live application commit | `fe609b623d5026f905825ab98d236d85692fb5ec` |
+| Latest verified live deployment | `dep-dbu6i30jo6nc738bdilg` |
 | Automatic deployments | Disabled; application releases are deployed manually |
 | Hosted AI | `AI_PROVIDER=disabled` |
 | Latest complete backend suite | **93 tests passed** (includes account/onboarding and prior security regressions) |
@@ -291,3 +291,15 @@ The user requested a temporary PWA button because they cannot conveniently navig
 [PR #9](https://github.com/temcwilliams/AIAGENTSAAS/pull/9) passed both GitHub workflows and merged as `fe609b623d5026f905825ab98d236d85692fb5ec`. Deployment `dep-dbu6i30jo6nc738bdilg` reached `live` on the existing Free Render service at 14:48:59 UTC. Frontend build and TypeScript checks passed; live `/health` returned 200; the served production bundle contains the administrator panel title, button label, and exact Microsoft Entra app-registration destination; recent error-level deploy logs were empty.
 
 The button is located at **Business settings → Temporary owner setup → Connect Outlook email**. It opens Microsoft in a new tab for the owner to complete registration. This release does not connect Outlook by itself, enable delivery, access mail, store Microsoft credentials, change the database, or send email. After Microsoft registration, the PWA still needs the OAuth integration/authorization step; the temporary guide will then be removed as requested.
+
+### 2026-11-17 — personal Outlook account blocked by Microsoft tenant requirement
+
+The user reported that Microsoft says the selected account does not exist in the **Microsoft Services** tenant and cannot access the application. This confirms the temporary Entra registration route is not usable with that personal Outlook account as currently configured. No Microsoft tenant, application registration, email connection, credential, or paid service was created. The recommended direction is to replace the temporary Microsoft guide with a free HTTPS transactional-email provider integration after the user chooses the provider; real delivery remains disabled in the meantime.
+
+### 2026-11-17 — Brevo Free email adapter implemented locally
+
+The user approved replacing the Microsoft route with Brevo only if no paid feature is required. Official current Brevo documentation was checked: the Free plan is advertised as free forever with no credit card and up to 300 emails/day after account approval, while an unauthenticated sender can be verified with a six-digit code sent to that address. Terms and account approval remain controlled by Brevo. Agent Meadow keeps its stricter 50 security-email/day default.
+
+Added a modular `brevo` HTTPS transport using Brevo's transactional-email endpoint, structured sender/recipient fields, bounded timeouts, safe failure behavior, and no response/link logging. Malformed sender configuration disables delivery. The prior Resend adapter remains available for compatibility. Replaced the administrator Microsoft panel with a Brevo Free signup/sender-verification guide that warns against upgrades, payment entry, or sharing the API key in Agent Meadow/chat. Updated environment/deployment templates and setup documentation.
+
+Local verification passed: **96 backend tests** (including three new mocked Brevo transport tests) and the Next.js production build/TypeScript validation. The full backend suite required sandbox network permission only for FastAPI's local in-memory TestClient loopback. No test contacted Brevo, sent real email, read an inbox, used a real key, changed production configuration, or enabled delivery. Publication, GitHub checks, Render deployment, and live verification remain pending.
