@@ -1,11 +1,11 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-17, 14:12 UTC**  
+Last updated: **2026-11-17, 14:21 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
 
-**Release A recovered and locally verified (2026-11-17):** the disconnected workspace returned with the account, onboarding, migration, UI and test files intact. The remaining invalid-token storage hardening and nonblank model validation were completed. The full backend suite now passes **93 tests**, and the frontend production build/TypeScript checks pass. Release A is still **not published or deployed**; production remains on schema `0004`. Public signup, real email delivery and hosted AI remain disabled.
+**Milestone 3 Release A is live and verified (2026-11-17).** [PR #8](https://github.com/temcwilliams/AIAGENTSAAS/pull/8) added secure recovery/setup/verification actions, scoped Viewer/Responder/Manager memberships, account disabling, and resumable owner-reviewed onboarding. GitHub checks, **93 backend tests**, the frontend build, disposable browser workflows, Render health checks, and live public access checks passed. Production is on schema `0006`. Public signup, real email delivery and hosted AI remain disabled.
 
 **Account access is owner-approved only, deployed and verified.** Public Create account and browser owner setup are removed. Businesses use **Request access by email** at `tmcwilliams2010@outlook.com`; the owner provisions approved businesses/clients through **Business settings**. The retired signup endpoint returns 403 before database/password work. Existing sign-in remains available. Independent red-team tests found no signup/provisioning bypass; the complete backend suite now has 68 passing tests. Strix is no longer on the active checklist.
 
@@ -21,13 +21,13 @@ Maintained as an ongoing project log. Read this file when starting or resuming w
 | Render service | `agent-studio-pwa-girg`, **Free** plan |
 | Render dashboard | [Service dashboard](https://dashboard.render.com/web/srv-dbriv0l6e07s73bs7p7g) |
 | Database | Neon project `aiagentsaas`, **Free** organization plan |
-| Live database migration | `0004` |
-| Latest verified live application commit | `4f139c64808643fff725c86021dc520294c9d976` |
-| Latest verified live deployment | `dep-dbtjk7ei0phs73di7410` |
+| Live database migration | `0006` |
+| Latest verified live application commit | `fc62e083f38c027ad8ace3f9894de9b31a72584e` |
+| Latest verified live deployment | `dep-dbu63uou01pc73dpisr0` |
 | Automatic deployments | Disabled; application releases are deployed manually |
 | Hosted AI | `AI_PROVIDER=disabled` |
-| Latest complete backend suite | **68 tests passed** (includes 19 local red-team regressions) |
-| Milestone 3 | [Six-workstream plan](docs/MILESTONE_3_PLAN.md) prepared for review; implementation not started |
+| Latest complete backend suite | **93 tests passed** (includes account/onboarding and prior security regressions) |
+| Milestone 3 | Release A live; [Release B–C plan](docs/MILESTONE_3_PLAN.md) remains pending |
 | Guided Linux setup | [Setup script](scripts/setup_ollama.py) ready; user still needs to run it on their Linux machine |
 | Initial administrator | Created through one-time owner setup; initial sign-in was verified |
 | Pilot business / starter agent | **Not created**; saved setup credentials were rejected during later verification |
@@ -118,16 +118,16 @@ The public hostname retains the original service name; the application, browser 
 
 | Area | Result | Scope / limit |
 |---|---|---|
-| Backend tests | **68 passed** | One upstream TestClient/httpx deprecation warning; no failing tests |
+| Backend tests | **93 passed** | One upstream TestClient/httpx deprecation warning; no failing tests |
 | Frontend production build | Passed | Includes TypeScript validation |
-| GitHub checks | Passed for owner-approved access release | PR #6 merged; frontend/API jobs and both push/PR runs succeeded. PR #7 red-team test/report follow-up merged after both push/PR workflows passed |
+| GitHub checks | Passed for Release A | PR #8 push and pull-request workflows succeeded before merge |
 | SQLite migration round trips | Passed | Includes populated-data preservation and full downgrade/reapply in disposable databases |
-| PostgreSQL migration | Passed on isolated Neon branch | Generated migration SQL applied; original row counts unchanged |
-| Production schema | Verified at `0004` | Application startup migrations completed on Render |
-| Browser workflows | Passed locally | Knowledge → cited response → consented lead → handoff → takeover → human reply; disposable data and a test-only model server |
+| PostgreSQL migration | Passed on isolated Neon branch and production | Production version/table presence checked read-only after deploy |
+| Production schema | Verified at `0006` | Membership, action-token, and onboarding tables present |
+| Browser workflows | Passed locally | Release A flow used disposable accounts/tokens; no real email or inference |
 | Floor responsiveness | Passed in Chromium | Desktop and mobile, with no horizontal overflow |
-| Live service | Healthy after security deployment | Public `/health` returned 200; Render deploy reached live |
-| Live frontend | Verified served | Bundle contains Meadow Commons, knowledge, and handoff interfaces |
+| Live service | Healthy after Release A deployment | Public `/health` returned 200; Render deploy reached live; no error-level deploy logs |
+| Live frontend | Verified served | Closed signup, owner email link, honest email-off recovery and mobile layout passed in Chromium |
 | Live endpoint protection | Verified after security release | Five protected APIs returned 401; untrusted-Origin write returned 403; one 65KB request returned 413 before authentication |
 | Live administrator pilot setup | Not completed | Saved setup password was rejected; no pilot business/agent was inserted |
 | Ollama setup automation | 7 installer tests passed as part of the 49-test suite | Publisher files/checksum availability verified online; binary/model downloads mocked in tests |
@@ -155,11 +155,11 @@ The isolated Neon branch `milestone2-validation` is retained for development val
 
 ### Planned next development milestone
 
-The user requested that account recovery, business onboarding, website widget, lead pipeline, team handoff management, and floor personalization be planned **before implementation**. The detailed sequence and acceptance criteria are in [Milestone 3 plan](docs/MILESTONE_3_PLAN.md). Only planning/documentation has been completed; none of these new workstreams is marked implemented or deployed. The plan retains original floor design, business isolation, and free-hosting constraints.
+The detailed sequence and acceptance criteria are in [Milestone 3 plan](docs/MILESTONE_3_PLAN.md). Release A (account access and business onboarding) is implemented and deployed. Release B (website widget and lead pipeline) and Release C (team handoff management and floor personalization) remain planned. The plan retains original floor design, business isolation, and free-hosting constraints.
 
 ### Before broad client access
 
-- [ ] Email ownership verification and email-based password recovery.
+- [ ] Configure a free HTTPS email provider and verified sender, then verify real inbox recovery/invitations. The secure flows are deployed but intentionally report unavailable while delivery is off.
 - [ ] Backup/restore operations and monitoring procedures tested in the intended environment.
 - [ ] Privacy/consent wording, retention/deletion policy, and audit logging decisions.
 - [ ] Review abuse protection and per-tenant token/resource budgets for actual traffic.
@@ -270,4 +270,12 @@ The existing coding workspace reconnected and the uncommitted Release A files we
 
 Full backend result: **93 passed**, with one upstream FastAPI TestClient/httpx deprecation warning. The Next.js 15.5.29 production build compiled, type-checked, generated all pages, and completed successfully. The reconnected execution sandbox requires loopback/network namespace permission for the in-memory TestClient; a minimal empty FastAPI app confirmed that environment behavior before the suite was rerun.
 
-The Release A Chromium workflow also passed against a fresh disposable localhost-only SQLite database. It verified closed public signup; explicit verification/setup actions with URL-fragment removal; password confirmation; honest disabled-email state; manager draft save/sign-out/resume/submit; owner change request/approval/publication; one managed agent/document; manual client creation; scoped role changes; mobile width; and no browser exceptions. Tokens and accounts were synthetic fixtures, not real delivery or customer data. No external API, real email, production database mutation, or model call was used. Documentation and environment templates were updated locally; publication, GitHub checks, production migration/deployment, and live verification remain pending.
+The Release A Chromium workflow also passed against a fresh disposable localhost-only SQLite database. It verified closed public signup; explicit verification/setup actions with URL-fragment removal; password confirmation; honest disabled-email state; manager draft save/sign-out/resume/submit; owner change request/approval/publication; one managed agent/document; manual client creation; scoped role changes; mobile width; and no browser exceptions. Tokens and accounts were synthetic fixtures, not real delivery or customer data. No external API, real email, production database mutation, or model call was used.
+
+### 2026-11-17 — Milestone 3 Release A deployed and verified
+
+[PR #8](https://github.com/temcwilliams/AIAGENTSAAS/pull/8) passed both GitHub workflows and merged as `fc62e083f38c027ad8ace3f9894de9b31a72584e`. Manual deploy `dep-dbu63uou01pc73dpisr0` reached `live` on the existing Free Render service at 14:18:52 UTC. No new service, paid plan, credential, email, or model call was added.
+
+Production checks passed: `/health` returned 200 with database readiness; Neon reported Alembic `0006` and the membership, action-token, and onboarding tables present; email status returned `available: false`; an absent-account recovery request returned an honest 503 saying no email was sent; retired signup returned 403; unauthenticated onboarding returned 401; and error-level deploy logs were empty. Live mobile Chromium verified sign-in, no Create account control, the owner contact link, disabled recovery control, no horizontal overflow, and no browser exceptions. The browser needed to ignore this development environment's inspection-proxy certificate after direct HTTPS checks succeeded; no deployed TLS setting was changed.
+
+Real recovery/invitation email still requires a separately configured free HTTPS provider credential and verified sender. Hosted AI remains disabled until the user's Linux Ollama bridge is available. Release B and Release C remain planned rather than implied complete.
