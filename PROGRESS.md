@@ -1,13 +1,13 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-17, 15:11 UTC**  
+Last updated: **2026-11-17, 15:18 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
 
 **Milestone 3 Release A is live and verified (2026-11-17).** [PR #8](https://github.com/temcwilliams/AIAGENTSAAS/pull/8) added secure recovery/setup/verification actions, scoped Viewer/Responder/Manager memberships, account disabling, and resumable owner-reviewed onboarding. GitHub checks, **93 backend tests**, the frontend build, disposable browser workflows, Render health checks, and live public access checks passed. Production is on schema `0006`. Public signup, real email delivery and hosted AI remain disabled.
 
-**Brevo Free email support is live and verified, with delivery intentionally disabled pending owner setup.** The unusable Microsoft Entra guide is replaced by an iPad-friendly Brevo Free setup guide, and the backend supports Brevo's HTTPS transactional-email API. The user explicitly approved this direction only if it uses no paid features. Delivery remains disabled until a free Brevo account is approved, the Outlook sender is verified, and the API key is stored directly in Render. No real email or Brevo API call has been made.
+**Brevo Free email support and its non-secret production settings are live, but delivery remains unavailable pending the Render secret.** The unusable Microsoft Entra guide is replaced by an iPad-friendly Brevo Free setup guide, and the backend supports Brevo's HTTPS transactional-email API. The user reported Brevo connected. Render now has `EMAIL_PROVIDER=brevo`, the verified Outlook sender identity, and the 50/day application limit, but the public status endpoint still reports unavailable; a usable `EMAIL_API_KEY` has not been stored in the service. No real email or Brevo API call has been made.
 
 **Account access is owner-approved only, deployed and verified.** Public Create account and browser owner setup are removed. Businesses use **Request access by email** at `tmcwilliams2010@outlook.com`; the owner provisions approved businesses/clients through **Business settings**. The retired signup endpoint returns 403 before database/password work. Existing sign-in remains available. Independent red-team tests found no signup/provisioning bypass; the complete backend suite now has 68 passing tests. Strix is no longer on the active checklist.
 
@@ -24,8 +24,8 @@ Maintained as an ongoing project log. Read this file when starting or resuming w
 | Render dashboard | [Service dashboard](https://dashboard.render.com/web/srv-dbriv0l6e07s73bs7p7g) |
 | Database | Neon project `aiagentsaas`, **Free** organization plan |
 | Live database migration | `0006` |
-| Latest verified live application commit | `b196476a82406ff73f709d155f7dbe787d6a8e2a` |
-| Latest verified live deployment | `dep-dbu6rtlckfvc73b9ead0` |
+| Latest verified live application commit | `ff6d65452755dd20b724c75c336394baa75341f4` (documentation-only follow-up; application code from `b196476a82406ff73f709d155f7dbe787d6a8e2a`) |
+| Latest verified live deployment | `dep-dbu6vegu01pc73drss6g` |
 | Automatic deployments | Disabled; application releases are deployed manually |
 | Hosted AI | `AI_PROVIDER=disabled` |
 | Latest complete backend suite | **93 tests passed** (includes account/onboarding and prior security regressions) |
@@ -309,3 +309,9 @@ Local verification passed: **96 backend tests** (including three new mocked Brev
 [PR #10](https://github.com/temcwilliams/AIAGENTSAAS/pull/10) passed its GitHub workflow and merged as `b196476a82406ff73f709d155f7dbe787d6a8e2a`. Manual deployment `dep-dbu6rtlckfvc73b9ead0` reached `live` on the existing Free Render service at 15:09:54 UTC. No new service, paid plan, database migration, credential, inbox access, or real provider request was added.
 
 Production verification passed: `/health` returned 200 with database readiness; `/api/auth/email/status` returned `available: false`; the served production JavaScript contains the new **Set up Brevo Free** and **Set up free email delivery** labels and no Microsoft Entra/Connect Outlook labels; and Render returned no error-level logs for the deployment window. The remaining owner steps are to create an approved Brevo Free account without entering payment details, verify `tmcwilliams2010@outlook.com` as the sender using Brevo's emailed code, create an API key, and store it directly in Render before enabling `EMAIL_PROVIDER=brevo`.
+
+### 2026-11-17 — non-secret Brevo production configuration enabled
+
+The user reported Brevo connected and asked to coordinate next steps. The named `$sol-foreman` skill was not available in the session, so coordination continued directly. Agent Meadow still reported email unavailable before configuration. Merged the non-secret Render settings `EMAIL_PROVIDER=brevo`, `EMAIL_FROM` for the verified Outlook sender, and the existing 50/day application limit while preserving all unrelated variables. No credential value was read, returned, or logged.
+
+Render automatically deployed documentation-only commit `ff6d65452755dd20b724c75c336394baa75341f4` as deployment `dep-dbu6vegu01pc73drss6g`; its application code is unchanged from the verified Brevo release. The deployment reached `live` at 15:17:11 UTC. `/health` returned 200 and deployment-window error logs were empty, but `/api/auth/email/status` remained `available: false`. This proves the non-secret settings are active but a usable `EMAIL_API_KEY` is not present. The owner must store the Brevo key directly in Render and deploy; it must not be pasted into chat or committed. No real email was sent.
