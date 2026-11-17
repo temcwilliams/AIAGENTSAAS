@@ -22,5 +22,9 @@ services:
         sync: false
       - key: AI_PROVIDER
         value: disabled
+      - key: EMAIL_PROVIDER
+        value: disabled
+      - key: MAIL_REQUESTS_PER_DAY
+        value: '50'
       - key: CHAT_REQUESTS_PER_HOUR
         value: '60'

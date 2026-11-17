@@ -54,18 +54,18 @@ export function AdminAccounts({businessId,currentUserId,onBusinessCreated,onBusi
  const roles=<><option value="viewer">Viewer · read dashboard</option><option value="responder">Responder · handle handoffs</option><option value="manager">Manager · onboarding and handoffs</option></>;
  return <div className="space-y-6">
   {error&&<p role="alert" className="text-red-300">{error}</p>}{notice&&<p role="status" className="text-emerald-200">{notice}</p>}
-  <section className="panel border-amber-500/40" aria-labelledby="outlook-setup-title">
-   <p className="text-xs uppercase tracking-widest text-amber-200 mb-2">Temporary owner setup</p>
-   <h2 id="outlook-setup-title">Connect Outlook email</h2>
-   <p className="text-sm text-slate-300 mt-3 max-w-3xl">Microsoft requires a one-time Agent Meadow application registration before this PWA can request permission to send recovery and invitation email. This button opens the correct Microsoft page in Safari. Sign in on Microsoft’s page—never enter your Microsoft password or an authorization code in Agent Meadow or chat.</p>
+  <section className="panel border-emerald-500/40" aria-labelledby="email-setup-title">
+   <p className="text-xs uppercase tracking-widest text-emerald-200 mb-2">Free email delivery setup</p>
+   <h2 id="email-setup-title">Set up Brevo Free</h2>
+   <p className="text-sm text-slate-300 mt-3 max-w-3xl">Brevo sends Agent Meadow recovery and invitation messages through HTTPS, so your personal Outlook address does not need a Microsoft business tenant. Its Free plan currently requires no credit card and allows up to 300 emails per day after approval. Agent Meadow is limited to 50 security emails per day.</p>
    <ol className="list-decimal ml-5 mt-4 space-y-2 text-sm text-slate-400">
-    <li>Tap the button and sign in with <span className="text-slate-200">tmcwilliams2010@outlook.com</span>.</li>
-    <li>Choose <span className="text-slate-200">New registration</span> and name it <span className="text-slate-200">Agent Meadow Email</span>.</li>
-    <li>Select accounts in any organization directory <span className="text-slate-200">and personal Microsoft accounts</span>.</li>
-    <li>Stop after registration. Do not create or paste a client secret yet; return to Agent Meadow for the next safe step.</li>
+    <li>Tap the button and create a <span className="text-slate-200">Free</span> Brevo account. Do not select an upgrade or enter payment details.</li>
+    <li>In Brevo, open <span className="text-slate-200">Settings → Senders, Domains &amp; IPs → Senders</span> and add <span className="text-slate-200">Agent Meadow &lt;tmcwilliams2010@outlook.com&gt;</span>.</li>
+    <li>Enter the six-digit sender verification code Brevo emails to that Outlook inbox.</li>
+    <li>Create a Brevo API key under <span className="text-slate-200">SMTP &amp; API → API Keys</span>. Do not paste the key into Agent Meadow or chat; it must be stored directly in Render.</li>
    </ol>
-   <a className="btn inline-block mt-5" target="_blank" rel="noreferrer" href="https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade">Open Microsoft email setup ↗</a>
-   <p className="text-xs text-slate-500 mt-4">This guide does not read mail or enable delivery by itself. It will be removed after Outlook authorization is complete.</p>
+   <a className="btn inline-block mt-5" target="_blank" rel="noreferrer" href="https://onboarding.brevo.com/account/register">Set up free email delivery ↗</a>
+   <p className="text-xs text-slate-500 mt-4">Brevo account approval and sender verification are controlled by Brevo. A free Outlook sender may have lower deliverability than an authenticated custom domain. This setup sends Agent Meadow messages only; it never reads your inbox.</p>
   </section>
   <div className="grid lg:grid-cols-2 gap-6">
    <form className="panel" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);run(async()=>{const b=await api<{id:string}>('/businesses','POST',{name:String(f.get('name'))});await onBusinessCreated(b.id)})}}><h2>Create business</h2><label htmlFor="new-business-name">Business name</label><input id="new-business-name" name="name" maxLength={120} required/><button className="btn mt-5" disabled={busy}>Create business</button></form>
