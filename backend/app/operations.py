@@ -5,7 +5,7 @@ from sqlalchemy import select, func, and_
 from sqlalchemy.orm import Session as DBSession
 import httpx
 from .db import get_db, locked_scalar
-from .security import tenant, admin
+from .security import tenant, admin, permission
 from .models import Agent, Conversation, Usage, Message, KnowledgeDocument, now
 from .schemas import KnowledgeInput, HandoffInput, HandoffStatus, HumanReply
 from .config import settings
@@ -45,12 +45,12 @@ def request_handoff(business_id:str,conversation_id:str,data:HandoffInput,db:DBS
         row.status='requested';row.handoff_reason=data.reason;row.handoff_requested_at=now()
     db.commit();return row
 
-@router.post('/conversations/{conversation_id}/handoff/status',dependencies=[Depends(admin)])
+@router.post('/conversations/{conversation_id}/handoff/status',dependencies=[Depends(permission('responder'))])
 def set_status(business_id:str,conversation_id:str,data:HandoffStatus,db:DBSession=Depends(get_db)):
     row=resource(db,Conversation,business_id,conversation_id,True)
     row.status=data.status;db.commit();return row
 
-@router.post('/conversations/{conversation_id}/reply',status_code=201,dependencies=[Depends(admin)])
+@router.post('/conversations/{conversation_id}/reply',status_code=201,dependencies=[Depends(permission('responder'))])
 def human_reply(business_id:str,conversation_id:str,data:HumanReply,db:DBSession=Depends(get_db)):
     row=resource(db,Conversation,business_id,conversation_id,True)
     if row.status!='human':raise HTTPException(409,'Take over this conversation before replying')

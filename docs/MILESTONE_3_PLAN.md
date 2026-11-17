@@ -1,6 +1,6 @@
 # Agent Meadow — Milestone 3 implementation plan
 
-Status: **Plan for review. Implementation has not started.**  
+Status: **Release A implemented locally and under release verification; not yet deployed. Releases B–C remain planned.**  
 Prepared: **2026-11-13**  
 Scope: all six workstreams requested by the user. This plan does not authorize a paid service, send email, reset an account, or change the live app.
 
@@ -14,7 +14,7 @@ The existing original Meadow Commons design remains the basis of floor personali
 
 - Milestones 1 and 2 are live: tenant isolation, accounts, agents, knowledge/citations, contact capture, human handoff, original floor, and PWA support.
 - The complete test baseline is **49 passing backend tests**. These are existing results; no tests were run merely to write this plan.
-- Policy updated 2026-11-16: businesses email the platform owner for access; public signup is disabled. There is no email verification or email-based recovery yet.
+- Policy updated 2026-11-16: businesses email the platform owner for access; public signup is disabled. Release A adds verification and recovery flows, while real delivery remains disabled until an HTTPS provider and verified sender are configured.
 - Clients currently have limited dashboard rights; platform administrators configure agents and handle human replies.
 - Chat is currently an authenticated dashboard playground. There is **no public website widget**.
 - Handoff and leads exist, but staff assignment, per-user unread notifications, and pipeline stages do not.
@@ -237,10 +237,11 @@ Before calling a release live, record the actual commit, deployment status, sche
 
 - [x] Inspect current application and progress record.
 - [x] Document all six workstreams, their sequence, permissions, dependencies, and acceptance criteria.
-- [ ] Review this plan with the user before implementation.
-- [ ] Implement/review Release A: account access and onboarding.
+- [x] Review this plan with the user before implementation.
+- [x] Implement Release A locally: account access and onboarding.
+- [ ] Publish, deploy, and verify Release A on the existing Free service.
 - [ ] Implement/review Release B: widget and lead pipeline.
 - [ ] Implement/review Release C: team handoff and floor personalization.
 - [ ] Complete real integration checks where external services/hardware are required.
 
-No application code, production configuration, database schema, account credentials, or live deployment was changed to produce this plan.
+Release A application code and migrations `0005`–`0006` now exist locally. The migrations passed disposable upgrade/downgrade tests and isolated Neon branch validation. Production remains on `0004` until the reviewed Release A commit is deployed. No account credentials, real email delivery, paid model calls, or production account reset were used for implementation verification.

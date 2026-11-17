@@ -6,6 +6,7 @@ class Credentials(BaseModel):
     password: str = Field(min_length=12, max_length=128)
 class ClientCreate(Credentials):
     business_id: str
+    business_role: Literal['viewer','responder','manager'] = 'viewer'
 class BusinessInput(BaseModel):
     name: str = Field(min_length=1, max_length=120)
 class AgentInput(BaseModel):

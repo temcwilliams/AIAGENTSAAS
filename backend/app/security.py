@@ -6,7 +6,7 @@ from argon2.exceptions import VerificationError, InvalidHashError
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy.orm import Session as DBSession
 from .db import get_db
-from .models import Session, User, Business
+from .models import Session, User, Business, Membership
 
 class BoundedPasswordHasher:
     """Bound Argon2 memory use across every hash and verification in this worker."""
@@ -40,7 +40,7 @@ def current_user(request: Request, db: DBSession = Depends(get_db)):
     if not session or session.expires_at.replace(tzinfo=timezone.utc) <= datetime.now(timezone.utc):
         raise HTTPException(401, "Authentication required")
     user = db.get(User, session.user_id)
-    if not user: raise HTTPException(401, "Authentication required")
+    if not user or user.disabled: raise HTTPException(401, "Authentication required")
     return user
 
 def admin(user=Depends(current_user)):
@@ -52,3 +52,23 @@ def tenant(business_id: str, user=Depends(current_user), db: DBSession=Depends(g
         raise HTTPException(404, "Business not found")
     if not db.get(Business, business_id): raise HTTPException(404, "Business not found")
     return business_id
+
+def business_role(db, user, business_id=None):
+    if user.role == 'admin': return 'admin'
+    bid = business_id or user.business_id
+    if bid != user.business_id: return None
+    membership = db.get(Membership, (bid, user.id))
+    return membership.role if membership else 'viewer'
+
+def permission(minimum):
+    def check(business_id: str, user=Depends(current_user), db: DBSession=Depends(get_db)):
+        tenant(business_id, user, db)
+        ranks={'viewer':0,'responder':1,'manager':2,'admin':3}
+        if ranks.get(business_role(db,user,business_id),-1) < ranks[minimum]:
+            raise HTTPException(403, f'{minimum.title()} access required')
+        return user
+    return check
+
+def identity(db, user):
+    return {'id':user.id,'email':user.email,'role':user.role,'business_id':user.business_id,
+            'business_role':business_role(db,user),'email_verified':bool(user.email_verified_at)}

@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, ForeignKey, ForeignKeyConstraint, UniqueConstraint, CheckConstraint, Text, JSON, Index
+from sqlalchemy import String, ForeignKey, ForeignKeyConstraint, UniqueConstraint, CheckConstraint, Text, JSON, Index, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from .db import Base
 
@@ -15,12 +15,14 @@ class Business(Base):
 
 class User(Base):
     __tablename__ = "users"
-    __table_args__ = (CheckConstraint("role IN ('admin','client')"), CheckConstraint("role = 'admin' OR business_id IS NOT NULL"))
+    __table_args__ = (CheckConstraint("role IN ('admin','client')"), CheckConstraint("role = 'admin' OR business_id IS NOT NULL"), UniqueConstraint('id','business_id',name='uq_users_id_business'))
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     email: Mapped[str] = mapped_column(String(254), unique=True)
     password_hash: Mapped[str] = mapped_column(Text)
     role: Mapped[str] = mapped_column(String(10))
     business_id: Mapped[str | None] = mapped_column(ForeignKey("businesses.id"))
+    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    disabled: Mapped[bool] = mapped_column(default=False, server_default='false')
 
 class Session(Base):
     __tablename__ = "sessions"
@@ -108,9 +110,54 @@ class OwnerSetup(Base):
 
 class KnowledgeDocument(Base):
     __tablename__ = "knowledge_documents"
+    __table_args__ = (UniqueConstraint('id','business_id',name='uq_knowledge_id_business'),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     business_id: Mapped[str] = mapped_column(ForeignKey("businesses.id"), index=True)
     title: Mapped[str] = mapped_column(String(200))
     content: Mapped[str] = mapped_column(Text)
     enabled: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(default=now)
+
+class Membership(Base):
+    __tablename__ = 'memberships'
+    __table_args__ = (
+        ForeignKeyConstraint(['user_id','business_id'],['users.id','users.business_id']),
+        CheckConstraint("role IN ('viewer','responder','manager')"),
+    )
+    business_id: Mapped[str] = mapped_column(ForeignKey('businesses.id'),primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36),primary_key=True)
+    role: Mapped[str] = mapped_column(String(12),default='viewer')
+
+class ActionToken(Base):
+    __tablename__ = 'action_tokens'
+    __table_args__ = (CheckConstraint("purpose IN ('reset','verify','setup')"), CheckConstraint("delivery_status IN ('pending','sent','failed')"),)
+    token_hash: Mapped[str] = mapped_column(String(64),primary_key=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey('users.id'),index=True)
+    purpose: Mapped[str] = mapped_column(String(12))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    consumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True),default=now)
+    delivery_status: Mapped[str] = mapped_column(String(12),default='pending')
+
+class OnboardingDraft(Base):
+    __tablename__ = 'onboarding_drafts'
+    __table_args__ = (
+        CheckConstraint('version >= 1'),
+        CheckConstraint("status IN ('draft','submitted','changes_requested','approved','published')"),
+        ForeignKeyConstraint(['agent_id','business_id'],['agents.id','agents.business_id']),
+        ForeignKeyConstraint(['knowledge_id','business_id'],['knowledge_documents.id','knowledge_documents.business_id']),
+    )
+    business_id: Mapped[str] = mapped_column(ForeignKey('businesses.id'),primary_key=True)
+    version: Mapped[int] = mapped_column(default=1)
+    status: Mapped[str] = mapped_column(String(20),default='draft')
+    profile: Mapped[dict] = mapped_column(JSON,default=dict)
+    reviewer_notes: Mapped[str] = mapped_column(Text,default='')
+    agent_id: Mapped[str | None] = mapped_column(String(36))
+    knowledge_id: Mapped[str | None] = mapped_column(String(36))
+    published_source_version: Mapped[int | None]
+    reviewed_by: Mapped[str | None] = mapped_column(ForeignKey('users.id'))
+    published_by: Mapped[str | None] = mapped_column(ForeignKey('users.id'))
+    template_version: Mapped[int] = mapped_column(default=1)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True),default=now)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
