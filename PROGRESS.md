@@ -1,11 +1,13 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-17, 14:21 UTC**  
+Last updated: **2026-11-17, 14:38 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
 
 **Milestone 3 Release A is live and verified (2026-11-17).** [PR #8](https://github.com/temcwilliams/AIAGENTSAAS/pull/8) added secure recovery/setup/verification actions, scoped Viewer/Responder/Manager memberships, account disabling, and resumable owner-reviewed onboarding. GitHub checks, **93 backend tests**, the frontend build, disposable browser workflows, Render health checks, and live public access checks passed. Production is on schema `0006`. Public signup, real email delivery and hosted AI remain disabled.
+
+**Temporary Outlook setup guide is being prepared, not yet deployed.** The user asked to connect both existing Outlook accounts to the PWA from an iPad. ChatGPT connector credentials cannot be exported to Agent Meadow, so an administrator-only Business settings panel will link directly to Microsoft Entra registration and explain the safe stopping point. This guide does not enable delivery, access mail, or store Microsoft credentials; it will be removed after the PWA receives its own OAuth authorization.
 
 **Account access is owner-approved only, deployed and verified.** Public Create account and browser owner setup are removed. Businesses use **Request access by email** at `tmcwilliams2010@outlook.com`; the owner provisions approved businesses/clients through **Business settings**. The retired signup endpoint returns 403 before database/password work. Existing sign-in remains available. Independent red-team tests found no signup/provisioning bypass; the complete backend suite now has 68 passing tests. Strix is no longer on the active checklist.
 
@@ -279,3 +281,7 @@ The Release A Chromium workflow also passed against a fresh disposable localhost
 Production checks passed: `/health` returned 200 with database readiness; Neon reported Alembic `0006` and the membership, action-token, and onboarding tables present; email status returned `available: false`; an absent-account recovery request returned an honest 503 saying no email was sent; retired signup returned 403; unauthenticated onboarding returned 401; and error-level deploy logs were empty. Live mobile Chromium verified sign-in, no Create account control, the owner contact link, disabled recovery control, no horizontal overflow, and no browser exceptions. The browser needed to ignore this development environment's inspection-proxy certificate after direct HTTPS checks succeeded; no deployed TLS setting was changed.
 
 Real recovery/invitation email still requires a separately configured free HTTPS provider credential and verified sender. Hosted AI remains disabled until the user's Linux Ollama bridge is available. Release B and Release C remain planned rather than implied complete.
+
+### 2026-11-17 — temporary iPad Outlook setup entry point requested
+
+The user requested a temporary PWA button because they cannot conveniently navigate the Microsoft setup portal from their iPad. Added an administrator-only Business settings guide that opens Microsoft Entra app registrations in a new browser tab, identifies the intended primary Outlook address, and explicitly warns against entering passwords or authorization codes in Agent Meadow or chat. This is navigation and guidance only: Outlook is not connected to the PWA, no mailbox was accessed, and real email delivery remains disabled pending Microsoft registration and a separate OAuth implementation/authorization step. Local verification and deployment are pending.

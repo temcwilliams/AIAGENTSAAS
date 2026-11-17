@@ -54,6 +54,19 @@ export function AdminAccounts({businessId,currentUserId,onBusinessCreated,onBusi
  const roles=<><option value="viewer">Viewer · read dashboard</option><option value="responder">Responder · handle handoffs</option><option value="manager">Manager · onboarding and handoffs</option></>;
  return <div className="space-y-6">
   {error&&<p role="alert" className="text-red-300">{error}</p>}{notice&&<p role="status" className="text-emerald-200">{notice}</p>}
+  <section className="panel border-amber-500/40" aria-labelledby="outlook-setup-title">
+   <p className="text-xs uppercase tracking-widest text-amber-200 mb-2">Temporary owner setup</p>
+   <h2 id="outlook-setup-title">Connect Outlook email</h2>
+   <p className="text-sm text-slate-300 mt-3 max-w-3xl">Microsoft requires a one-time Agent Meadow application registration before this PWA can request permission to send recovery and invitation email. This button opens the correct Microsoft page in Safari. Sign in on Microsoft’s page—never enter your Microsoft password or an authorization code in Agent Meadow or chat.</p>
+   <ol className="list-decimal ml-5 mt-4 space-y-2 text-sm text-slate-400">
+    <li>Tap the button and sign in with <span className="text-slate-200">tmcwilliams2010@outlook.com</span>.</li>
+    <li>Choose <span className="text-slate-200">New registration</span> and name it <span className="text-slate-200">Agent Meadow Email</span>.</li>
+    <li>Select accounts in any organization directory <span className="text-slate-200">and personal Microsoft accounts</span>.</li>
+    <li>Stop after registration. Do not create or paste a client secret yet; return to Agent Meadow for the next safe step.</li>
+   </ol>
+   <a className="btn inline-block mt-5" target="_blank" rel="noreferrer" href="https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade">Open Microsoft email setup ↗</a>
+   <p className="text-xs text-slate-500 mt-4">This guide does not read mail or enable delivery by itself. It will be removed after Outlook authorization is complete.</p>
+  </section>
   <div className="grid lg:grid-cols-2 gap-6">
    <form className="panel" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);run(async()=>{const b=await api<{id:string}>('/businesses','POST',{name:String(f.get('name'))});await onBusinessCreated(b.id)})}}><h2>Create business</h2><label htmlFor="new-business-name">Business name</label><input id="new-business-name" name="name" maxLength={120} required/><button className="btn mt-5" disabled={busy}>Create business</button></form>
    <form className="panel" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);run(async()=>{await api('/businesses/'+businessId,'PUT',{name:String(f.get('name'))});await onBusinessChanged();setNotice('Business name updated.')})}}><h2>Rename selected business</h2><label htmlFor="rename-business">New business name</label><input id="rename-business" name="name" maxLength={120} required/><button className="btn mt-5" disabled={busy||!businessId}>Save business name</button></form>
