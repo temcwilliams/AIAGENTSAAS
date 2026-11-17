@@ -1,13 +1,13 @@
 # Agent Meadow — project progress
 
-Last updated: **2026-11-17, 14:38 UTC**  
+Last updated: **2026-11-17, 14:50 UTC**  
 Maintained as an ongoing project log. Read this file when starting or resuming work, and update it as meaningful work completes.
 
 ## Current status
 
 **Milestone 3 Release A is live and verified (2026-11-17).** [PR #8](https://github.com/temcwilliams/AIAGENTSAAS/pull/8) added secure recovery/setup/verification actions, scoped Viewer/Responder/Manager memberships, account disabling, and resumable owner-reviewed onboarding. GitHub checks, **93 backend tests**, the frontend build, disposable browser workflows, Render health checks, and live public access checks passed. Production is on schema `0006`. Public signup, real email delivery and hosted AI remain disabled.
 
-**Temporary Outlook setup guide is being prepared, not yet deployed.** The user asked to connect both existing Outlook accounts to the PWA from an iPad. ChatGPT connector credentials cannot be exported to Agent Meadow, so an administrator-only Business settings panel will link directly to Microsoft Entra registration and explain the safe stopping point. This guide does not enable delivery, access mail, or store Microsoft credentials; it will be removed after the PWA receives its own OAuth authorization.
+**Temporary Outlook setup guide is live.** The user asked to connect both existing Outlook accounts to the PWA from an iPad. ChatGPT connector credentials cannot be exported to Agent Meadow, so an administrator-only Business settings panel now links directly to Microsoft Entra registration and explains the safe stopping point. This guide does not enable delivery, access mail, or store Microsoft credentials; it will be removed after the PWA receives its own OAuth authorization.
 
 **Account access is owner-approved only, deployed and verified.** Public Create account and browser owner setup are removed. Businesses use **Request access by email** at `tmcwilliams2010@outlook.com`; the owner provisions approved businesses/clients through **Business settings**. The retired signup endpoint returns 403 before database/password work. Existing sign-in remains available. Independent red-team tests found no signup/provisioning bypass; the complete backend suite now has 68 passing tests. Strix is no longer on the active checklist.
 
@@ -285,3 +285,9 @@ Real recovery/invitation email still requires a separately configured free HTTPS
 ### 2026-11-17 — temporary iPad Outlook setup entry point requested
 
 The user requested a temporary PWA button because they cannot conveniently navigate the Microsoft setup portal from their iPad. Added an administrator-only Business settings guide that opens Microsoft Entra app registrations in a new browser tab, identifies the intended primary Outlook address, and explicitly warns against entering passwords or authorization codes in Agent Meadow or chat. This is navigation and guidance only: Outlook is not connected to the PWA, no mailbox was accessed, and real email delivery remains disabled pending Microsoft registration and a separate OAuth implementation/authorization step. Local verification and deployment are pending.
+
+### 2026-11-17 — temporary Outlook setup button deployed
+
+[PR #9](https://github.com/temcwilliams/AIAGENTSAAS/pull/9) passed both GitHub workflows and merged as `fe609b623d5026f905825ab98d236d85692fb5ec`. Deployment `dep-dbu6i30jo6nc738bdilg` reached `live` on the existing Free Render service at 14:48:59 UTC. Frontend build and TypeScript checks passed; live `/health` returned 200; the served production bundle contains the administrator panel title, button label, and exact Microsoft Entra app-registration destination; recent error-level deploy logs were empty.
+
+The button is located at **Business settings → Temporary owner setup → Connect Outlook email**. It opens Microsoft in a new tab for the owner to complete registration. This release does not connect Outlook by itself, enable delivery, access mail, store Microsoft credentials, change the database, or send email. After Microsoft registration, the PWA still needs the OAuth integration/authorization step; the temporary guide will then be removed as requested.
